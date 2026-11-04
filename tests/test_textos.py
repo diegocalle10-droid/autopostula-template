@@ -74,6 +74,14 @@ class Validacion(unittest.TestCase):
 class Cierre(unittest.TestCase):
     R = SimpleNamespace(secuencia="BDB", busquedas=2, nuevas=5, aptas=1, revisar=0, descartadas=4)
 
+    def test_sin_enlace_de_la_rutina_el_resumen_no_lo_muestra(self):
+        antes = mensajes._cat().ajustes["url_rutina"]
+        mensajes._cat().ajustes["url_rutina"] = "PENDIENTE"
+        self.addCleanup(mensajes._cat().ajustes.__setitem__, "url_rutina", antes)
+        cierre = mensajes.fin_captura(None)
+        self.assertNotIn("PENDIENTE", cierre)
+        self.assertIn(mensajes.ajuste("hora_rutina"), cierre)
+
     def test_el_resumen_de_captura_enlaza_la_rutina_y_dice_cuando_se_apaga(self):
         cierre = mensajes.fin_captura("03:25")
         texto = mensajes.captura("31/10/2026", "tiempo cumplido", self.R, "completa", [], cierre)

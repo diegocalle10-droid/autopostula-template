@@ -12,6 +12,7 @@ Los envía el PC al terminar `run-continuo` o `detail`, y el protocolo de sesió
 | revisar_bloque | \n\n{n} ofertas por revisar ({resumen}):\n{lista}\n{consulta} |
 | revisar_vineta | • {job_id} · {cabecera} · {motivo} |
 | fin_captura_rutina | \n\nRutina de CV: lánzala ahora desde {url} o se dispara sola a las {hora}. |
+| fin_captura_rutina_sin_enlace | \n\nRutina de CV: se dispara sola a las {hora}. |
 | fin_captura_apagado | \nEl PC se apaga a las {hora}. Para cancelarlo: shutdown /a |
 | aviso_linkedin | {emoji} LinkedIn: {texto} |
 | linkedin_verificacion | pidió una verificación al iniciar ({url}). Se para. |

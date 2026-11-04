@@ -15,6 +15,7 @@ from collector.online import consultas
 
 Fila = Dict[str, object]
 _RAIZ_INPUTS = Path(__file__).resolve().parents[2] / "inputs"
+SIN_RELLENAR = "PENDIENTE"   # lo que dicen los ajustes de enlaces.md hasta que la instalación los rellena
 _catalogo: Optional[ConfigMensajes] = None
 
 
@@ -146,7 +147,10 @@ def captura(dia: str, motivo: str, r, subida: str, revisar: Optional[List[Fila]]
 
 def fin_captura(hora_apagado: Optional[str]) -> str:
     """Cierre del resumen de la captura: cómo lanzar la rutina de CV y, si está activado, cuándo se apaga el PC."""
-    cierre = texto("fin_captura_rutina", url=Html(ajuste("url_rutina")), hora=ajuste("hora_rutina"))
+    if ajuste("url_rutina").strip().upper() == SIN_RELLENAR:   # el enlace es opcional (guia/rutina.md)
+        cierre = texto("fin_captura_rutina_sin_enlace", hora=ajuste("hora_rutina"))
+    else:
+        cierre = texto("fin_captura_rutina", url=Html(ajuste("url_rutina")), hora=ajuste("hora_rutina"))
     return cierre + (texto("fin_captura_apagado", hora=hora_apagado) if hora_apagado else "")
 
 

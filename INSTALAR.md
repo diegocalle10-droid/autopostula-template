@@ -68,9 +68,9 @@ Con `gh` autenticado: `gh secret set -f .env` (sube `NEON_DATABASE_URL`, `TELEGR
 ## 8. La rutina de CV
 
 1. Token de GitHub (guía `guia/github.md`, sección «Token»). Lo guarda él; no lo pegues en el chat.
-2. Conector de Neon en claude.ai (guía `guia/conector-neon.md`).
-3. Rutina (guía `guia/rutina.md`): su repositorio, las instrucciones de `CV/PROMPT_MINIMO.md`, disparo diario a su `hora_rutina`, el conector de Neon y la variable de entorno `GITHUB_TOKEN_AUTOPOSTULA` con el token. Repásalo con él antes de guardarla.
-4. Pídele el enlace de la rutina y escríbelo en `url_rutina` de `inputs/mensajes/enlaces.md`. Commit y push.
+2. Conector de Neon como conector personalizado de Claude (guía `guia/conector-neon.md`).
+3. Rutina, en Programadas de la app de escritorio (guía `guia/rutina.md`): su repositorio, las instrucciones de `CV/PROMPT_MINIMO.md`, disparo diario a su `hora_rutina`, el conector de Neon y la variable de entorno `GITHUB_TOKEN_AUTOPOSTULA` con el token. Repásalo con él antes de guardarla.
+4. Pídele el enlace de la rutina (opcional: la guía explica cómo conseguirlo) y escríbelo en `url_rutina` de `inputs/mensajes/enlaces.md`. Si no lo encuentra, déjalo en `PENDIENTE`: todo funciona igual. Commit y push.
 
 ## 9. Bot de gestión (opcional)
 
@@ -80,10 +80,10 @@ Si lo quiere: `skills-project-bot/LEEME.md` y guía `guia/bot.md`.
 
 Solo cuando todo lo anterior está hecho. Si algo falla, vuelve al paso que corresponda.
 
-1. `python cli.py doctor`: todo `OK` (sin enlaces `PENDIENTE`).
+1. `python cli.py doctor`: todo `OK` (el único `PENDIENTE` que se admite es `url_rutina`).
 2. `python cli.py online-estado`: conecta con Neon.
 3. La Action: `gh workflow run cv-pdf.yml -f fuente=manual` y `gh run watch`. Debe terminar en verde (sin `gh`: Actions → «CV a PDF» → Run workflow).
-4. La rutina: que la lance a mano una vez desde su enlace («Run now»). Debe terminar diciendo el código de la Action (`204`), y en `gh run list` aparece una ejecución nueva de «CV a PDF».
+4. La rutina: que la lance a mano una vez desde Programadas (botón de ejecutar ahora). Debe terminar diciendo el código de la Action (`204`), y en `gh run list` aparece una ejecución nueva de «CV a PDF».
 5. **Activación:** añade el cron de seguridad a `.github/workflows/cv-pdf.yml`, una vez al día a las 12:00 de su `zona_horaria` convertidas a UTC (calcúlalo con Python y `zoneinfo`), justo debajo del bloque `workflow_dispatch`:
    ```
      schedule:

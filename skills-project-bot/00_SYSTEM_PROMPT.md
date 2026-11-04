@@ -1,4 +1,4 @@
-# Instrucciones del bot «Autopostula»
+# Instrucciones del bot «Autopostula_Neon_Bot»
 
 > Cómo se monta el bot: `LEEME.md` de esta carpeta.
 

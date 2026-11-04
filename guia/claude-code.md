@@ -1,24 +1,47 @@
 # Claude Code: abrir tu repositorio
 
-Claude Code es la parte de Claude que trabaja con archivos y comandos. Lo usas dos veces: en la web para la entrevista y en la app de escritorio para instalar en tu PC. Viene incluido en Claude Pro.
+Claude Code es la parte de Claude que trabaja con archivos y comandos. Lo usas dos veces: para la entrevista (en la nube, sin instalar nada) y para instalar en tu PC. Viene incluido en Claude Pro. Las dos veces se hace desde la app de escritorio de Claude (claude.ai/download) o desde claude.ai/code.
 
-## A. En la web, para la entrevista (no instala nada)
+## A. La entrevista (en la nube)
 
-1. Entra en **claude.ai/code** con tu cuenta de Claude.
-   ![Pantalla inicial de claude.ai/code](img/claude-code-01.png) *(captura pendiente)*
-2. La primera vez te pide **conectar GitHub**. Acepta e instala la app de Claude en GitHub. Cuando GitHub pregunte a qué repositorios da acceso, elige **Only select repositories** y marca tu repositorio privado de Autopostula (o «All repositories»).
-   ![Permisos de la app de Claude en GitHub](img/claude-code-02.png) *(captura pendiente)*
-3. Si creaste el repositorio después de instalar la app, añádelo: GitHub → Settings → Applications → Claude → Configure → añade el repositorio.
-4. En claude.ai/code, elige tu repositorio en el selector y escribe: **«configura mi Autopostula»**.
-   ![Selector de repositorio y caja de mensaje](img/claude-code-03.png) *(captura pendiente)*
-5. Para adjuntar tu CV en PDF, usa el clip de la caja de mensaje.
+### 1. Conecta GitHub (solo la primera vez)
 
-## B. En tu PC, para la instalación
+Al elegir un repositorio por primera vez, Claude te pide conectar GitHub. Acepta: GitHub abre la página de instalación de la app de Claude.
 
-1. Descarga e instala la **app de escritorio de Claude** desde claude.ai/download e inicia sesión.
-2. Abre la pestaña **Code**.
-   ![Pestaña Code de la app de escritorio](img/claude-code-04.png) *(captura pendiente)*
-3. Elige como carpeta de trabajo una carpeta vacía, por ejemplo `Documentos\Autopostula`.
-4. Escribe: **«Clona https://github.com/<tu-usuario>/<tu-repo> aquí y sigue INSTALAR.md»**.
-5. Claude te pedirá permiso antes de ejecutar comandos o cambiar ajustes: léelo y acepta.
-   ![Petición de permiso de un comando](img/claude-code-05.png) *(captura pendiente)*
+1. En **Repository access** elige **Only select repositories**.
+2. Abre el desplegable **Select repositories** y marca tu repositorio privado de Autopostula (también vale **All repositories**).
+3. Pulsa **Install**.
+
+![Instalación de la app de Claude en GitHub: Only select repositories, el desplegable y el botón Install](img/claude-code-01.png)
+
+*(Ilustración: GitHub puede cambiar el diseño de esta página, pero los tres pasos son los mismos.)*
+
+Si ya habías instalado la app y tu repositorio es nuevo, no te aparecerá en la lista: GitHub → **Settings** → **Applications** → **Claude** → **Configure** → añade el repositorio.
+
+### 2. Abre una sesión y elige tu repositorio
+
+1. En la app, abre la pestaña **Code** (el botón `</>` de arriba a la izquierda).
+
+   ![Pestaña Code, arriba a la izquierda](img/claude-code-03.png)
+
+2. En **Nueva sesión**, deja el entorno en la nube (**Default**, 2 en la captura), pulsa **Repo** y elige tu repositorio de la lista (1).
+
+   ![Entorno Default y desplegable de repositorios](img/claude-code-02.png)
+
+3. Escribe **«configura mi Autopostula»** y sigue la entrevista. Para adjuntar tu CV en PDF, usa el **+** de la caja de mensaje.
+
+## B. La instalación en tu PC
+
+1. Abre otra vez la pestaña **Code** y pulsa **Crear**.
+2. Elige como carpeta de trabajo una carpeta vacía de tu PC, por ejemplo `Documentos\Autopostula` (1 en la captura).
+3. Escribe: **«Clona https://github.com/&lt;tu-usuario&gt;/&lt;tu-repositorio&gt; aquí y sigue INSTALAR.md»** (2 en la captura) y pulsa Intro.
+
+   ![Nueva sesión local: carpeta de trabajo y mensaje de clonado](img/claude-code-04.png)
+
+   *(En la captura la carpeta se llama `sesion-aislada` y el repositorio es el de la plantilla; en el tuyo serán los tuyos.)*
+
+4. Claude te pedirá permiso antes de ejecutar comandos o cambiar ajustes de tu PC: lee lo que va a hacer y pulsa **Permitir**. Si algo no lo entiendes, pulsa **Denegar** y pregúntale.
+
+   ![Petición de permiso para ejecutar un comando](img/claude-code-05.png)
+
+   *(Ilustración: el texto exacto del aviso puede variar.)*

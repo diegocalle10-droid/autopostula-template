@@ -31,6 +31,7 @@ CAMPOS: Dict[str, Tuple[str, ...]] = {
     "consulta": ("sql", "url"),
     "sql_rechazo": ("job_id",),
     "fin_captura_rutina": ("url", "hora"),
+    "fin_captura_rutina_sin_enlace": ("hora",),
     "fin_captura_apagado": ("hora",),
     "aviso_linkedin": ("emoji", "texto"),
     "linkedin_verificacion": ("url",),

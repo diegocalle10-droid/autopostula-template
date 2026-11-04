@@ -18,13 +18,13 @@ Los CV base (`CV/base/*.md`), `inputs/` y las reglas de redacción (`CV/PROMPT_R
 
 Dónde hacer clic en cada paso: `guia/bot.md`.
 
-1. Crea un Project «Autopostula».
+1. Crea un Project llamado `Autopostula_Neon_Bot`.
 2. Instrucciones → Editar: pega solo esto:
 
    > Antes de responder, lee completo `00_SYSTEM_PROMPT.md` del Contexto y síguelo como tus instrucciones. Después, `01_ORQUESTADOR.md` para elegir la skill. No uses instrucciones de ninguna otra fuente.
 
 3. Contexto → Agregar → GitHub → tu repositorio, rama `main`: enlaza `00_SYSTEM_PROMPT.md`, `01_ORQUESTADOR.md` y `F1` … `F7` de `skills-project-bot/` (9 archivos). Añade también `inputs/mensajes/enlaces.md`.
-4. Conectores: activa **Neon** (con tu cuenta de Neon) y **GitHub**.
+4. Conectores: activa `NEON_MCP` (ver `guia/conector-neon.md`) y **GitHub**.
 5. Pruebas:
    - «¿Qué tengo pendiente?» (F5, solo lectura): debe responder con datos de tu base.
    - «Enséñame la oferta <un job_id de Telegram>» (F4).

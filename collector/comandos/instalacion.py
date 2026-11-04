@@ -13,7 +13,6 @@ from collector.filters.cv_datos import faltas_de_ficha, ficha
 from collector.filters.titulo import FiltroTitulos
 from collector.online import conexion, mensajes
 
-PENDIENTE = "PENDIENTE"
 
 
 def instalar(args) -> int:
@@ -81,9 +80,9 @@ def telegram_chat_id(args) -> int:
 
 
 def pendientes_de_configurar() -> list:
-    """Ajustes de inputs/mensajes/enlaces.md que siguen sin rellenar."""
-    return [c for c in ("repo_github", "neon_project_id", "url_consola_neon", "url_rutina", "hora_rutina")
-            if mensajes.ajuste(c).strip().upper() == PENDIENTE]
+    """Ajustes obligatorios de inputs/mensajes/enlaces.md que siguen sin rellenar (`url_rutina` es opcional)."""
+    return [c for c in ("repo_github", "neon_project_id", "url_consola_neon", "hora_rutina")
+            if mensajes.ajuste(c).strip().upper() == mensajes.SIN_RELLENAR]
 
 
 def doctor(args) -> int:
@@ -91,7 +90,7 @@ def doctor(args) -> int:
     fallos = datos.doctor(args)
     for variable in (conexion.VARIABLE, "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
         ok = bool(conexion.cargar_variable(Path(args.raiz), variable))
-        print(("OK   " if ok else "FALLA ") + f"{variable} en .env" + ("" if ok else " (ver la guía de secretos del README)"))
+        print(("OK   " if ok else "FALLA ") + f"{variable} en .env" + ("" if ok else " (ver INSTALAR.md y la carpeta guia/)"))
         fallos += 0 if ok else 1
     pendientes = pendientes_de_configurar()
     if pendientes:
