@@ -31,7 +31,7 @@ Bot de gestión (Project de Claude, opcional): decidir, regenerar y consultar de
 
 1. **Tu copia privada.** En esta página: **Use this template → Create a new repository → Private**. Tiene que ser privado: va a guardar tu CV.
 2. **La entrevista (sin instalar nada).** Abre [claude.ai/code](https://claude.ai/code), conecta tu GitHub (dale acceso a tu repositorio nuevo), elígelo y escribe **«configura mi Autopostula»**. Claude te pide tu CV en PDF y te pregunta qué buscas, dónde, en qué modalidad, qué idiomas aceptas y a qué hora quieres los CV. Guion: [CONFIGURAR.md](CONFIGURAR.md).
-3. **La instalación en tu PC (guiada).** Abre la app de escritorio de Claude → pestaña **Code** → una carpeta vacía, y escribe: «Clona https://github.com/&lt;tu-usuario&gt;/&lt;tu-repo&gt; aquí y sigue INSTALAR.md». Claude comprueba lo que falta y te acompaña con Neon, Telegram, LinkedIn, los secretos de GitHub y la rutina de CV, y termina activando el envío diario cuando todo funciona. Guion: [INSTALAR.md](INSTALAR.md); guías con capturas de cada servicio en `guia/`.
+3. **La instalación en tu PC (guiada).** Abre la app de escritorio de Claude → pestaña **Code** → una carpeta vacía, y escribe: «Clona https://github.com/&lt;tu-usuario&gt;/&lt;tu-repo&gt; aquí y sigue INSTALAR.md». Claude comprueba lo que falta y te acompaña con Neon, Telegram, LinkedIn, los secretos de GitHub y la rutina de CV, y termina con una ronda de comprobación. Guion: [INSTALAR.md](INSTALAR.md); guías con capturas de cada servicio en `guia/`.
 
 `python cli.py doctor` te dice en cualquier momento qué falta. Mientras algún enlace de `inputs/mensajes/enlaces.md` diga `PENDIENTE`, los mensajes de Telegram lo muestran tal cual: la instalación los rellena.
 

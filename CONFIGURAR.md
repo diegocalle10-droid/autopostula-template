@@ -6,7 +6,7 @@
 
 - Eres quien entrevista. Habla en español, breve y claro, como con alguien que no es técnico. Haz **una pregunta o un bloque corto a la vez** y espera la respuesta.
 - **No inventes datos del CV.** Todo dato personal, empresa, fecha, título o certificación sale del CV que da el usuario, copiado tal cual.
-- Escribe solo en `inputs/`, `CV/base/`, `.github/workflows/cv-pdf.yml` (la línea del `cron`) y, para borrar el PDF, `CV/entrada/`. No toques el código.
+- Escribe solo en `inputs/`, `CV/base/` y, para borrar el PDF, `CV/entrada/`. No toques el código.
 - Respeta el formato de cada tabla de `inputs/` (columnas y cabeceras). Los ejemplos de formato completos están en `tests/fixtures/inputs/`.
 - Si el usuario ya configuró antes (hay filas en `inputs/cv.md`, `inputs/puestos.md` o `inputs/ubicaciones.md`), enséñale un resumen y pregúntale qué parte quiere cambiar; haz solo esa.
 - Antes del primer comando, instala las dependencias: `pip install -r requirements.txt`.

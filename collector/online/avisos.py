@@ -1,5 +1,5 @@
 """Bandeja de salida de mensajes de texto en Neon (`avisos`). Encolar va en la misma transacción que el cambio que
-lo motiva; enviar los saca en orden. Uno que falla queda pendiente para la próxima pasada (o la del cron diario de la Action)."""
+lo motiva; enviar los saca en orden. Uno que falla queda pendiente para la próxima pasada (o la siguiente vez que se lance la Action)."""
 from __future__ import annotations
 
 from typing import Callable

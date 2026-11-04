@@ -65,7 +65,7 @@ def _comandos_online(sub) -> None:
     op = sub.add_parser("online-pdf", help="valida los CV redactados en Neon y genera sus PDF (lo ejecuta GitHub Actions)")
     op.add_argument("--salida", default="CV/pdf", help="carpeta de los PDF, relativa a la raíz")
     op.add_argument("--max", type=int, default=50)
-    op.add_argument("--fuente", choices=("manual", "rutina", "cron"), default="manual",
+    op.add_argument("--fuente", choices=("manual", "rutina"), default="manual",
                     help="quién la lanza; con «rutina» se envía además el resumen de la ejecución")
     op.set_defaults(f=online.online_pdf)
 

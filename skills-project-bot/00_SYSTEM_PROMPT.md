@@ -34,7 +34,7 @@ No puedes lanzar la Action de GitHub ni la rutina. Cuando una skill termine con 
 
 > Listo. Para generar y enviarte el PDF, lanza la Action: https://github.com/<repo_github>/actions/workflows/cv-pdf.yml (con el `repo_github` de `inputs/mensajes/enlaces.md`) → «Run workflow» → fuente `manual` → «Run workflow».
 
-Si el usuario no la lanza, la Action corre sola una vez al día (cron de `.github/workflows/cv-pdf.yml`) y procesa lo pendiente.
+Si el usuario no la lanza, la dispara la rutina de CV en su siguiente ejecución (cada día) y procesa lo pendiente.
 
 ## Mapa de la base (lo mínimo para orientarte)
 

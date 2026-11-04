@@ -1,6 +1,6 @@
 # INSTALAR — Puesta en marcha en tu PC
 
-> Única fuente del guion de instalación. Lo sigue Claude Code en tu ordenador (app de escritorio de Claude → pestaña **Code**) después de la entrevista (`CONFIGURAR.md`). Deja instalada la captura, conectados Neon, Telegram, GitHub y la rutina, y termina activando el envío diario cuando todo funciona.
+> Única fuente del guion de instalación. Lo sigue Claude Code en tu ordenador (app de escritorio de Claude → pestaña **Code**) después de la entrevista (`CONFIGURAR.md`). Deja instalada la captura, conectados Neon, Telegram, GitHub y la rutina, y termina con una ronda de comprobación.
 
 ## 0. Reglas para Claude
 
@@ -76,7 +76,7 @@ Con `gh` autenticado: `gh secret set -f .env` (sube `NEON_DATABASE_URL`, `TELEGR
 
 Si lo quiere: `skills-project-bot/LEEME.md` y guía `guia/bot.md`.
 
-## 10. Ronda de comprobación y activación
+## 10. Ronda de comprobación
 
 Solo cuando todo lo anterior está hecho. Si algo falla, vuelve al paso que corresponda.
 
@@ -84,10 +84,4 @@ Solo cuando todo lo anterior está hecho. Si algo falla, vuelve al paso que corr
 2. `python cli.py online-estado`: conecta con Neon.
 3. La Action: `gh workflow run cv-pdf.yml -f fuente=manual` y `gh run watch`. Debe terminar en verde (sin `gh`: Actions → «CV a PDF» → Run workflow).
 4. La rutina: que la lance a mano una vez desde Programadas (botón de ejecutar ahora). Debe terminar diciendo el código de la Action (`204`), y en `gh run list` aparece una ejecución nueva de «CV a PDF».
-5. **Activación:** añade el cron de seguridad a `.github/workflows/cv-pdf.yml`, una vez al día a las 12:00 de su `zona_horaria` convertidas a UTC (calcúlalo con Python y `zoneinfo`), justo debajo del bloque `workflow_dispatch`:
-   ```
-     schedule:
-       - cron: "M H * * *"
-   ```
-   Commit («Activación: envío diario») y push.
-6. Despídete con lo esencial: esta noche, doble clic en `iniciar.bat`, Intro (o las horas que quiera) y a dormir; el PC se apaga solo al terminar (pasados `apagar_tras_captura_min` minutos), y a su `hora_rutina` llegan los CV a Telegram.
+5. Despídete con lo esencial: esta noche, doble clic en `iniciar.bat`, Intro (o las horas que quiera) y a dormir; el PC se apaga solo al terminar (pasados `apagar_tras_captura_min` minutos), y a su `hora_rutina` llegan los CV a Telegram.
