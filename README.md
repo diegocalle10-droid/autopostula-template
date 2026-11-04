@@ -2,6 +2,10 @@
 
 Busca ofertas de LinkedIn mientras duermes y te deja por la mañana, en Telegram, un CV en PDF adaptado a cada oferta que encaja contigo. Tú solo revisas y te postulas.
 
+https://github.com/user-attachments/assets/a64ef442-f424-4377-a880-1d90cfd11e68
+
+<sub>Video de 50 s, todo simulado (la persona y las ofertas son ficticias). Música: Sascha Ende, ende.app (CC BY 4.0).</sub>
+
 > **Aviso legal.** La captura usa tu propia cuenta de LinkedIn de forma automatizada, lo que va contra sus condiciones de uso. Lo haces bajo tu responsabilidad: va despacio, se para ante cualquier aviso y no usa proxies ni trucos para esconderse, pero el riesgo es tu cuenta. Recomendado: una cuenta secundaria. Este proyecto no tiene relación con LinkedIn ni con Anthropic.
 
 ## Cómo funciona
