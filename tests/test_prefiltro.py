@@ -4,7 +4,6 @@ import unittest
 from dataclasses import replace
 from types import SimpleNamespace
 
-from collector.db import externas_repo
 from collector.db.connection import transaccion
 from collector.filters.titulo import FiltroTitulos
 from collector.pipeline import cuota
@@ -122,12 +121,6 @@ class Detalle(Base):
 
 
 class Cuota(Base):
-    def test_las_peticiones_externas_se_cuentan_en_el_recuento_del_dia(self):
-        with transaccion(self.con):
-            externas_repo.registrar(self.con, "busqueda", 16, a_iso(self.reloj()), "sonda")
-            externas_repo.registrar(self.con, "detalle", 10, a_iso(self.reloj()), "sonda")
-        self.assertEqual(cuota.usadas_hoy(self.con, self.reloj())["externas"], 26)
-
     def test_un_detalle_con_429_cuenta_como_peticion(self):
         from collector.db import eventos_repo
         with transaccion(self.con):

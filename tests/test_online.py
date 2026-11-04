@@ -9,8 +9,7 @@ from tests.test_db import fila
 
 AHORA = "2026-10-28T12:00:00Z"
 # 002/003 de Neon usan sintaxis de PostgreSQL; para las pruebas, la misma tabla en SQLite.
-AVISOS_SQLITE = """ALTER TABLE ofertas ADD COLUMN revisada_en TEXT;
-CREATE TABLE avisos (aviso_id INTEGER PRIMARY KEY, creado_en TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+AVISOS_SQLITE = """CREATE TABLE avisos (aviso_id INTEGER PRIMARY KEY, creado_en TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
                      texto TEXT NOT NULL, enviado_en TEXT, tipo TEXT NOT NULL DEFAULT 'texto');"""
 
 
@@ -18,7 +17,7 @@ class Subida(unittest.TestCase):
     def setUp(self):
         self.local, self.remoto = base_en_memoria(), base_en_memoria()
         self.remoto.execute("DELETE FROM sync_pendientes")
-        self.remoto.execute("ALTER TABLE ofertas ADD COLUMN revisada_en TEXT")   # como 003_mensajes.sql en Neon
+        self.remoto.execute("ALTER TABLE ofertas ADD COLUMN revisada_en TEXT")   # la columna que solo tiene Neon (001_neon.sql)
         self.addCleanup(self.local.close)
         self.addCleanup(self.remoto.close)
         for i in range(1, 6):

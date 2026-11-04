@@ -1,4 +1,5 @@
-"""Puesta en marcha de una instalación nueva: instalar (todo de una vez), validar-cv y telegram-chat-id."""
+"""Puesta en marcha de una instalación nueva: instalar (todo de una vez), doctor, validar-cv, probar-titulos y
+telegram-chat-id."""
 from __future__ import annotations
 
 import json

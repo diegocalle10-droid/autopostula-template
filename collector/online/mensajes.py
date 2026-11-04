@@ -104,15 +104,14 @@ def sin_cv(o: Fila) -> str:
                  url=_e(o.get("url"), 300))
 
 
-def rechazo(o: Fila, intento: int, motivo: str) -> str:
-    cierre = texto("rechazo_cierre_final" if intento >= int(ajuste("intentos_maximos")) else "rechazo_cierre_reintento",
-                   job_id=o["job_id"])
-    return texto("rechazo", cabecera=_cabecera(o), job_id=o["job_id"], intento=intento, maximo=ajuste("intentos_maximos"),
+def rechazo(o: Fila, intento: int, maximo: int, motivo: str) -> str:
+    cierre = texto("rechazo_cierre_final" if intento >= maximo else "rechazo_cierre_reintento", job_id=o["job_id"])
+    return texto("rechazo", cabecera=_cabecera(o), job_id=o["job_id"], intento=intento, maximo=maximo,
                  motivo=_e(motivo, 600), url=_e(o.get("url"), 300), cierre=cierre, consulta=_consulta(texto("sql_rechazo", job_id=o["job_id"])))
 
 
-def resumen_rutina(dia: str, redactados: int, correcciones: int, sin_cv_n: int, quedan: List[Fila]) -> str:
-    bloque = texto("resumen_quedan", tope=ajuste("tope_rutina"), lista=_vinetas_ofertas(quedan)) if quedan else ""
+def resumen_rutina(dia: str, redactados: int, correcciones: int, sin_cv_n: int, quedan: List[Fila], tope: int) -> str:
+    bloque = texto("resumen_quedan", tope=tope, lista=_vinetas_ofertas(quedan)) if quedan else ""
     return texto("resumen_rutina", dia=dia, redactados=redactados, correcciones=correcciones, sin_cv=sin_cv_n,
                  quedan=len(quedan), bloque=Html(bloque))
 

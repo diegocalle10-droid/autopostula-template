@@ -1,4 +1,4 @@
-"""Única frontera con LinkedIn: navega con la sesión guardada de tu cuenta (Chrome visible, perfil en data/perfil_cuenta_b)
+"""Única frontera con LinkedIn: navega con la sesión guardada de tu cuenta (Chrome visible, perfil en data/perfil_linkedin)
 y devuelve listas de ofertas y detalles. Corre en este PC, sin ningún
 modelo. El ritmo entre peticiones lo pone `pipeline/ritmo`; los avisos de LinkedIn salen como `LimiteError`."""
 from __future__ import annotations
@@ -13,7 +13,7 @@ from collector.linkedin.errores import LimiteError, LinkedinError, NoEncontradaE
 from collector.util import reloj
 from collector.util.texto import normalizar
 
-PERFIL = ("data", "perfil_cuenta_b")
+PERFIL = ("data", "perfil_linkedin")
 _ESPERA_PAGINA_MS = 60000
 _SIN_RESULTADOS = "no se han encontrado|no hay resultados|no matching jobs|no results found"
 

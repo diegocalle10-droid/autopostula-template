@@ -1,4 +1,4 @@
-"""Comandos que no hacen peticiones a LinkedIn: init-db, plan, prune, status, doctor, reanudar, registrar-externas."""
+"""Comandos que no hacen peticiones a LinkedIn: init-db, plan, reevaluar, prune, status, doctor (la parte del entorno) y reanudar."""
 from __future__ import annotations
 
 import importlib.util
@@ -6,7 +6,7 @@ from pathlib import Path
 
 from collector.config.cargar import cargar_config
 from collector.config.modelos import ConfigError
-from collector.db import combinaciones_repo, eventos_repo, externas_repo, ofertas_repo
+from collector.db import combinaciones_repo, eventos_repo, ofertas_repo
 from collector.db.connection import conectar, transaccion
 from collector.db.migrar import migrar, version_actual
 from collector.linkedin import sesion
@@ -76,19 +76,6 @@ def reanudar(args) -> int:
     return 0
 
 
-def registrar_externas(args) -> int:
-    """Anota peticiones hechas fuera del recolector para que entren en el recuento del día."""
-    con = conectar(args.db)
-    migrar(con)
-    ahora = reloj.a_iso(reloj.ahora())
-    with transaccion(con):
-        for tipo, n in (("busqueda", args.busquedas), ("detalle", args.detalles)):
-            if n > 0:
-                externas_repo.registrar(con, tipo, n, ahora, args.nota)
-    print(f"Registradas: {args.busquedas} búsquedas y {args.detalles} detalles externos ({args.nota or 'sin nota'}).")
-    return 0
-
-
 def status(args) -> int:
     cfg = cargar_config(args.inputs)
     con = conectar(args.db)
@@ -99,8 +86,7 @@ def status(args) -> int:
     print(f"Agenda: {c['activas']} combinaciones activas de {c['total']}; "
           f"{combinaciones_repo.contar_debidas(con, reloj.a_iso(ahora))} pendientes de ejecutar")
     u = cuota.usadas_hoy(con, ahora)
-    print(f"Peticiones hoy: {sum(u.values())} "
-          f"(búsquedas {u['busquedas']}, detalles {u['detalles']}, externas {u['externas']})")
+    print(f"Peticiones hoy: {sum(u.values())} (búsquedas {u['busquedas']}, detalles {u['detalles']})")
     sel = seleccion.seleccionar(ofertas_repo.pendientes_de_detalle(con), cfg)
     print(f"Detalle pendiente: {sel.total_elegibles} elegibles, en espera de confirmar país {sel.en_espera.get('pais_sin_confirmar', 0)}, "
           f"por descartar por título {ingest.por_descartar_por_titulo(con, cfg)}")

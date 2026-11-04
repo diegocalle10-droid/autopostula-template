@@ -7,11 +7,10 @@ import time
 from typing import Callable, Dict, List, Tuple
 
 # Orden por claves foráneas. Clave primaria de cada tabla = (k1[, k2]) de la cola.
-ORDEN = ["ofertas", "combinaciones", "consultas", "oferta_keywords", "hallazgos", "eventos", "peticiones_externas"]
+ORDEN = ["ofertas", "combinaciones", "consultas", "oferta_keywords", "hallazgos", "eventos"]
 PK: Dict[str, Tuple[str, ...]] = {
     "ofertas": ("job_id",), "oferta_keywords": ("job_id", "keyword"), "combinaciones": ("combinacion_id",),
     "consultas": ("consulta_id",), "hallazgos": ("job_id", "consulta_id"), "eventos": ("evento_id",),
-    "peticiones_externas": ("externa_id",),
 }
 LOTE = {"ofertas": 100}
 LOTE_POR_DEFECTO = 500

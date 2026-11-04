@@ -49,8 +49,8 @@ class Validacion(unittest.TestCase):
         with self.assertRaisesRegex(ConfigError, "nada_por_redactar"):
             textos.cargar(self.inputs)
         self._editar("| otra_cosa |", "| nada_por_redactar |")
-        self._editar("| tope_rutina | 30 |", "| tope_rutina | treinta |")
-        with self.assertRaisesRegex(ConfigError, "tope_rutina"):
+        self._editar("| presupuesto_vinetas | 3000 |", "| presupuesto_vinetas | tres mil |")
+        with self.assertRaisesRegex(ConfigError, "presupuesto_vinetas"):
             textos.cargar(self.inputs)
 
     def test_una_clave_repetida_en_dos_archivos_falla(self):

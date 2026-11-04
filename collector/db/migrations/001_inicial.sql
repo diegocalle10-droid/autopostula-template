@@ -1,4 +1,5 @@
--- Esquema inicial.
+-- Base local (SQLite): búfer de la captura antes de subir a Neon. Las tablas de la captura llevan los mismos campos
+-- y CHECK que en collector/online/migrations/001_neon.sql; aquí se añade la cola de subida (sección 7).
 -- 1. OFERTAS ---------------------------------------------------------------
 CREATE TABLE ofertas (
   job_id               TEXT    PRIMARY KEY,         -- id numérico de LinkedIn; NO se genera en local
@@ -98,14 +99,47 @@ CREATE TABLE eventos (
 );
 CREATE INDEX ix_eventos_pausa ON eventos (pausa_hasta);
 
--- 7. PETICIONES EXTERNAS (hechas fuera del recolector; entran en el recuento diario)
-CREATE TABLE peticiones_externas (
-  externa_id    INTEGER PRIMARY KEY,
-  ejecutada_en  TEXT    NOT NULL,
-  tipo          TEXT    NOT NULL,
-  cantidad      INTEGER NOT NULL,
-  nota          TEXT,
-  CHECK (tipo IN ('busqueda','detalle')),
-  CHECK (cantidad > 0)
+-- 7. COLA DE SINCRONIZACIÓN CON NEON ------------------------------------------
+-- Los disparadores anotan cada fila insertada, cambiada o borrada; `online-subir` la vacía al terminar la ejecución.
+-- (Los disparadores usan ON CONFLICT DO NOTHING: un INSERT OR IGNORE interno lo anula el upsert de la sentencia que lo dispara.)
+-- Una fila de la cola se borra solo después de que Neon confirme el cambio, así que un corte se retoma donde quedó.
+CREATE TABLE sync_pendientes (
+  tabla  TEXT NOT NULL,
+  k1     TEXT NOT NULL,
+  k2     TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (tabla, k1, k2)
 );
-CREATE INDEX ix_externas_dia ON peticiones_externas (ejecutada_en);
+
+CREATE TRIGGER sync_ofertas_i AFTER INSERT ON ofertas BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('ofertas', NEW.job_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_ofertas_u AFTER UPDATE ON ofertas BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('ofertas', NEW.job_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_ofertas_d AFTER DELETE ON ofertas BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('ofertas', OLD.job_id) ON CONFLICT DO NOTHING; END;
+
+CREATE TRIGGER sync_keywords_i AFTER INSERT ON oferta_keywords BEGIN
+  INSERT INTO sync_pendientes VALUES ('oferta_keywords', NEW.job_id, NEW.keyword) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_keywords_d AFTER DELETE ON oferta_keywords BEGIN
+  INSERT INTO sync_pendientes VALUES ('oferta_keywords', OLD.job_id, OLD.keyword) ON CONFLICT DO NOTHING; END;
+
+CREATE TRIGGER sync_comb_i AFTER INSERT ON combinaciones BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('combinaciones', NEW.combinacion_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_comb_u AFTER UPDATE ON combinaciones BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('combinaciones', NEW.combinacion_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_comb_d AFTER DELETE ON combinaciones BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('combinaciones', OLD.combinacion_id) ON CONFLICT DO NOTHING; END;
+
+CREATE TRIGGER sync_consultas_i AFTER INSERT ON consultas BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('consultas', NEW.consulta_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_consultas_u AFTER UPDATE ON consultas BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('consultas', NEW.consulta_id) ON CONFLICT DO NOTHING; END;
+
+CREATE TRIGGER sync_hallazgos_i AFTER INSERT ON hallazgos BEGIN
+  INSERT INTO sync_pendientes VALUES ('hallazgos', NEW.job_id, NEW.consulta_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_hallazgos_d AFTER DELETE ON hallazgos BEGIN
+  INSERT INTO sync_pendientes VALUES ('hallazgos', OLD.job_id, OLD.consulta_id) ON CONFLICT DO NOTHING; END;
+
+CREATE TRIGGER sync_eventos_i AFTER INSERT ON eventos BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('eventos', NEW.evento_id) ON CONFLICT DO NOTHING; END;
+CREATE TRIGGER sync_eventos_u AFTER UPDATE ON eventos BEGIN
+  INSERT INTO sync_pendientes (tabla, k1) VALUES ('eventos', NEW.evento_id) ON CONFLICT DO NOTHING; END;

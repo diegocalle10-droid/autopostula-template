@@ -31,7 +31,7 @@ def base_en_memoria():
 
 
 def reloj_fijo(dia: int = 28, hora: int = 12):
-    """Un reloj que siempre marca las `hora`:00 locales del día `dia` de octubre de 2026 (dentro del horario)."""
+    """Un reloj que siempre marca las `hora`:00 locales del día `dia` de octubre de 2026."""
     instante = datetime(2026, 10, dia, hora, 0).astimezone()
     return lambda: instante
 

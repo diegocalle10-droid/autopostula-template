@@ -242,11 +242,11 @@ def _cv(carpeta: Path) -> ConfigCv:
     cvs = tuple(CvBase(f["id"], f["archivo"], f["perfil"]) for f in _tabla(t, "cv_base", "cv.md", ("id", "archivo", "perfil")))
     if len({c.id for c in cvs}) != len(cvs):
         raise ConfigError("cv.md: hay ids de CV repetidos")
-    r = _reglas(t, "cv.md", ("umbral_afinidad",))
+    r = _reglas(t, "cv.md", ("umbral_afinidad", "tope_rutina"))
     umbral = _entero(r["umbral_afinidad"], "cv.md: umbral_afinidad")
     if not 0 <= umbral <= 100:
         raise ConfigError("cv.md: umbral_afinidad debe estar entre 0 y 100")
-    return ConfigCv(cvs, umbral)
+    return ConfigCv(cvs, umbral, _entero(r["tope_rutina"], "cv.md: tope_rutina"))
 
 
 def cargar_cv(carpeta) -> ConfigCv:

@@ -1,4 +1,4 @@
-"""Ejecuta una tanda de búsquedas respetando horario, ritmo y disyuntor."""
+"""Ejecuta una tanda de búsquedas respetando ritmo y disyuntor."""
 from __future__ import annotations
 
 import math
@@ -10,6 +10,7 @@ from typing import Callable, Optional
 from collector.config.modelos import Config, Ubicacion
 from collector.db import combinaciones_repo, consultas_repo
 from collector.db.connection import transaccion
+from collector.linkedin import lectura
 from collector.linkedin.errores import LimiteError, LinkedinError
 from collector.filters.titulo import FiltroTitulos
 from collector.pipeline import breaker
@@ -17,7 +18,6 @@ from collector.pipeline.ingest import ingerir
 from collector.pipeline.ritmo import Ritmo
 from collector.util.reloj import a_iso, de_iso
 
-POR_PAGINA = 25   # LinkedIn con sesión devuelve 25 resultados por página
 
 
 @dataclass
@@ -40,7 +40,7 @@ def jobage_para(combo: sqlite3.Row, cfg: Config, ahora: datetime) -> int:
 
 def _hay_otra_pagina(n_resultados: int, n_nuevos: int, n_perfil: int, cfg: Config) -> bool:
     """Otra página si esta vino llena, con ofertas nuevas y con títulos del perfil (la relevancia cae página a página)."""
-    return (n_resultados >= POR_PAGINA and n_nuevos / n_resultados >= cfg.lotes.decimal("umbral_pagina_nuevas")
+    return (n_resultados >= lectura.POR_PAGINA and n_nuevos / n_resultados >= cfg.lotes.decimal("umbral_pagina_nuevas")
             and n_perfil / n_resultados >= cfg.lotes.decimal("umbral_pagina_perfil"))
 
 

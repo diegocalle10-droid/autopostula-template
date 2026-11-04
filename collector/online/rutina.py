@@ -41,15 +41,16 @@ def _contar(pg, condicion: str, desde: str) -> int:
     return cur.fetchone()[0]
 
 
-def encolar_resumen(pg, dia: str) -> str:
-    """Resumen de la ejecución de la rutina. Devuelve qué mensaje se encoló: resumen, nada o sin_registros."""
+def encolar_resumen(pg, dia: str, tope: int) -> str:
+    """Resumen de la ejecución de la rutina (`tope`: tope_rutina de inputs/cv.md). Devuelve qué mensaje se encoló:
+    resumen, nada o sin_registros."""
     desde = _desde(pg)
     redactados = _contar(pg, "estado <> 'sin_cv'", desde)
     correcciones = _contar(pg, "estado <> 'sin_cv' AND intentos > 0", desde)
     sin_cv = _contar(pg, "estado = 'sin_cv'", desde)
     quedan = _filas(pg, _QUEDAN, ("job_id", "empresa", "titulo"))
     if redactados or sin_cv:
-        tipo, texto = "resumen", mensajes.resumen_rutina(dia, redactados, correcciones, sin_cv, quedan)
+        tipo, texto = "resumen", mensajes.resumen_rutina(dia, redactados, correcciones, sin_cv, quedan, tope)
     elif not quedan:
         tipo, texto = "nada", mensajes.nada_por_redactar(dia)
     else:

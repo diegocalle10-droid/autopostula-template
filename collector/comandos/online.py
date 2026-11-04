@@ -58,7 +58,7 @@ def online_pdf(args) -> int:
         r = pdfs.procesar(pg, cfg, Path(args.raiz), Path(args.raiz) / args.salida, ahora, args.max,
                           enviar=notif.documento if notif else None)
         sin_cv = rutina.encolar_sin_cv(pg, ahora)
-        cierre = rutina.encolar_resumen(pg, mensajes.fecha(instante)) if args.fuente == "rutina" else "-"
+        cierre = rutina.encolar_resumen(pg, mensajes.fecha(instante), cfg.cv.tope_rutina) if args.fuente == "rutina" else "-"
         textos = avisos.enviar_pendientes(pg, notif.texto, ahora) if notif else 0
     finally:
         pg.close()

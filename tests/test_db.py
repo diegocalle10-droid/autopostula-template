@@ -21,8 +21,8 @@ class Migraciones(unittest.TestCase):
     def test_se_aplican_una_vez(self):
         con = conectar(":memory:")
         self.addCleanup(con.close)
-        self.assertEqual(migrar(con), [1, 2, 3, 4])
-        self.assertEqual(version_actual(con), 4)
+        self.assertEqual(migrar(con), [1])
+        self.assertEqual(version_actual(con), 1)
         self.assertEqual(migrar(con), [])   # idempotente
 
 

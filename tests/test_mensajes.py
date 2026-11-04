@@ -33,7 +33,7 @@ def avisos(con, tipo=None):
 
 class Plantillas(unittest.TestCase):
     def test_todas_llevan_el_id_en_su_linea_y_escapan_el_html(self):
-        for texto in (mensajes.cv_listo(O), mensajes.sin_cv(O), mensajes.rechazo(O, 1, "ocupa 3 páginas")):
+        for texto in (mensajes.cv_listo(O), mensajes.sin_cv(O), mensajes.rechazo(O, 1, 3, "ocupa 3 páginas")):
             self.assertIn("\nID: 4012345678\n", texto)
             self.assertIn("Acme &lt;SL&gt;", texto)
 
@@ -43,12 +43,12 @@ class Plantillas(unittest.TestCase):
 
     def test_las_listas_largas_se_resumen_sin_pasar_de_4096(self):
         quedan = [dict(O, job_id=str(i), titulo="T" * 150) for i in range(200)]
-        texto = mensajes.resumen_rutina("30/10/2026", 5, 1, 2, quedan)
+        texto = mensajes.resumen_rutina("30/10/2026", 5, 1, 2, quedan, 30)
         self.assertLess(len(texto), 4096)
         self.assertIn("más", texto.splitlines()[-1])
 
     def test_el_rechazo_final_lleva_consulta_y_enlace_a_neon(self):
-        texto = mensajes.rechazo(O, 3, "x")
+        texto = mensajes.rechazo(O, 3, 3, "x")
         self.assertIn("<code>SELECT * FROM emparejamientos WHERE job_id = '4012345678';</code>", texto)
         self.assertIn(mensajes.ajuste("url_consola_neon"), texto)
         self.assertIn("No se reintenta más", texto)
@@ -84,21 +84,21 @@ class Rutina(unittest.TestCase):
 
     def test_nada_por_redactar(self):
         self.con.execute("UPDATE ofertas SET estado = 'descartada', motivo_descarte = 'x'")
-        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026"), "nada")
+        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026", 30), "nada")
         self.assertEqual(avisos(self.con), ["ℹ️ Nada por redactar hoy 30/10/2026"])
 
     def test_rutina_que_no_registra_nada_avisa_de_lo_que_queda(self):
-        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026"), "sin_registros")
+        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026", 30), "sin_registros")
         self.assertIn("• 1 · Acme", avisos(self.con)[0])
 
     def test_resumen_cuenta_solo_lo_de_esta_ejecucion(self):
         self.con.execute("INSERT INTO emparejamientos (job_id,estado,cv_id,afinidad,cv_md,emparejado_en) "
                          "VALUES ('1','redactada','data_analytics',80,'x','2999-01-01T00:00:00Z')")
-        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026"), "resumen")
+        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "30/10/2026", 30), "resumen")
         self.assertIn("Redactados 1", avisos(self.con)[0])
         self.con.execute("UPDATE emparejamientos SET emparejado_en = '2000-01-01T00:00:00Z'")   # ya contado
         self.con.execute("UPDATE ofertas SET estado = 'descartada', motivo_descarte = 'x'")
-        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "31/10/2026"), "nada")
+        self.assertEqual(rutina.encolar_resumen(FalsoNeon(self.con), "31/10/2026", 30), "nada")
 
 
 class Neon(unittest.TestCase):

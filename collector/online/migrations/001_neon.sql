@@ -10,7 +10,7 @@ CREATE TABLE ofertas (
   modalidad TEXT NOT NULL, modalidad_detectada TEXT,
   idioma_titulo TEXT, idioma_contenido TEXT, nivel_idioma TEXT,
   estado TEXT NOT NULL DEFAULT 'pendiente', motivo_descarte TEXT, huella TEXT,
-  duplicada_de TEXT REFERENCES ofertas(job_id),
+  duplicada_de TEXT REFERENCES ofertas(job_id), revisada_en TEXT,
   CHECK (estado IN ('pendiente','apta','revisar','descartada')),
   CHECK (activa IS NULL OR activa IN (0,1)),
   CHECK (nivel_idioma IS NULL OR nivel_idioma IN ('ninguno','aceptable','exigente','dudoso')),
@@ -28,7 +28,7 @@ CREATE TABLE oferta_keywords (
 CREATE INDEX ix_keywords_keyword ON oferta_keywords (keyword);
 
 -- Réplica de la captura (PC de captura, vía la cola sync_pendientes de SQLite): agenda término × ubicación, cada petición
--- de búsqueda, qué consulta halló qué oferta, incidentes del disyuntor y peticiones hechas fuera del recolector.
+-- de búsqueda, qué consulta halló qué oferta e incidentes del disyuntor.
 CREATE TABLE combinaciones (
   combinacion_id BIGINT PRIMARY KEY, termino TEXT NOT NULL, ubicacion_frase TEXT NOT NULL,
   prioridad INTEGER NOT NULL, cadencia_dias INTEGER NOT NULL, ultima_ejecucion TEXT, proxima_ejecucion TEXT,
@@ -57,11 +57,6 @@ CREATE TABLE eventos (
   CHECK (tipo IN ('429','vacios_repetidos','fallo'))
 );
 
-CREATE TABLE peticiones_externas (
-  externa_id BIGINT PRIMARY KEY, ejecutada_en TEXT NOT NULL, tipo TEXT NOT NULL, cantidad INTEGER NOT NULL, nota TEXT,
-  CHECK (tipo IN ('busqueda','detalle')), CHECK (cantidad > 0)
-);
-
 -- CV a medida. Lo escriben la rutina de la nube y el bot (F1, F3, F6); lo valida la Action `CV a PDF`.
 -- sin_cv -> nada encaja | redactada -> espera validación | rechazada -> falló la validación (se reintenta)
 -- validada -> pasó, PDF generado y enviado por Telegram
@@ -77,7 +72,8 @@ CREATE TABLE emparejamientos (
 );
 CREATE INDEX ix_emparejamientos_estado ON emparejamientos (estado);
 
--- Ofertas por redactar: aptas (y solo aptas) sin emparejamiento, más las rechazadas con menos de 3 intentos.
+-- Ofertas por redactar: aptas (y solo aptas) sin emparejamiento, más las rechazadas con menos de 3 intentos
+-- (regla fija: la misma cifra es INTENTOS_MAXIMOS en collector/online/pdfs.py).
 CREATE VIEW ofertas_por_redactar AS
 SELECT o.job_id, o.titulo, o.empresa, o.ubicacion, o.pais, o.modalidad, o.url, o.descripcion,
        e.rechazo, COALESCE(e.intentos, 0) AS intentos

@@ -1,7 +1,7 @@
 """Validación y PDF de los CV que redactó la rutina (estado `redactada` en Neon). Lo ejecuta GitHub Actions, sin IA.
 Pasa las reglas de siempre (collector/filters) contra el CV base. Si falla: `rechazada` con el motivo y un intento más;
-la rutina lo reescribe mientras `intentos` < 3, y se avisa en el 1.º y el 3.º. Si pasa: PDF de máximo 2 páginas,
-sin marcas, `validada`, y se envía por Telegram con su pie."""
+la rutina lo reescribe mientras `intentos` < INTENTOS_MAXIMOS, y se avisa en el primero y en el último. Si pasa: PDF de
+como mucho MAX_PAGINAS páginas, sin marcas, `validada`, y se envía por Telegram con su pie."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,7 +18,8 @@ _PENDIENTES = """SELECT e.job_id, e.cv_id, e.cv_md, e.afinidad, e.intentos, o.em
                  FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id
                  WHERE e.estado = 'redactada' OR (e.estado = 'validada' AND e.notificado_en IS NULL)
                  ORDER BY e.emparejado_en LIMIT %s"""
-INTENTOS_CON_AVISO = (1, 3)
+INTENTOS_MAXIMOS = 3   # regla fija del sistema; la vista ofertas_por_redactar (001_neon.sql) usa la misma cifra
+INTENTOS_CON_AVISO = (1, INTENTOS_MAXIMOS)
 Enviar = Callable[[Path, str], None]
 
 
@@ -39,7 +40,7 @@ def _rechazar(pg, o: Dict, motivo: str) -> None:
     pg.cursor().execute("UPDATE emparejamientos SET estado = 'rechazada', rechazo = %s, intentos = %s WHERE job_id = %s",
                         (motivo[:1000], intento, o["job_id"]))
     if intento in INTENTOS_CON_AVISO:
-        avisos.encolar(pg, mensajes.rechazo(o, intento, motivo), "rechazo")
+        avisos.encolar(pg, mensajes.rechazo(o, intento, INTENTOS_MAXIMOS, motivo), "rechazo")
     pg.commit()
 
 

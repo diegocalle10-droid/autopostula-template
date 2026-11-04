@@ -44,8 +44,8 @@ CAMPOS: Dict[str, Tuple[str, ...]] = {
 }
 CON_EMOJI = tuple(i for i, c in CAMPOS.items() if "emoji" in c)
 AJUSTES = ("repo_github", "neon_project_id", "zona_horaria", "formato_fecha", "formato_hora", "formato_hora_corta", "url_consola_neon", "url_rutina", "hora_rutina",
-           "presupuesto_vinetas", "intentos_maximos", "tope_rutina", "prefijo_pdf", "sin_empresa", "sin_motivo") + tuple(f"emoji_{i}" for i in CON_EMOJI)
-ENTEROS = ("presupuesto_vinetas", "intentos_maximos", "tope_rutina")
+           "presupuesto_vinetas", "prefijo_pdf", "sin_empresa", "sin_motivo") + tuple(f"emoji_{i}" for i in CON_EMOJI)
+ENTEROS = ("presupuesto_vinetas",)
 
 
 def _marcadores(plantilla: str) -> set:

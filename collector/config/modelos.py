@@ -11,9 +11,9 @@ class ConfigError(Exception):
 
 @dataclass(frozen=True)
 class Ubicacion:
-    tipo: str                      # pais | region
+    tipo: str                      # pais | region | ciudad (informativo)
     frase: str
-    pais_esperado: Optional[str]   # None para regiones
+    pais_esperado: Optional[str]   # None en una región de varios países
 
 
 @dataclass(frozen=True)
@@ -156,9 +156,10 @@ class CvBase:
 
 @dataclass(frozen=True)
 class ConfigCv:
-    """CV base y umbral de afinidad (inputs/cv.md)."""
+    """CV base y reglas de la rutina (inputs/cv.md)."""
     cvs: Tuple[CvBase, ...]
     umbral_afinidad: int
+    tope_rutina: int
 
     def cv(self, cv_id: str) -> Optional[CvBase]:
         return next((c for c in self.cvs if c.id == cv_id), None)
