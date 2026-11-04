@@ -1,6 +1,6 @@
 # Orquestador: qué skill usar en cada caso
 
-Lee este mapa antes de actuar. Elige **una** skill y lee solo esa. Los disparadores son ejemplos, no una lista cerrada: el usuario habla en lenguaje natural, con sinónimos, faltas, mayúsculas y frases a medias. Decide por la **intención** y traduce sus palabras con el glosario.
+Lee este mapa antes de actuar. Elige **una** skill y lee solo esa. Los disparadores de cada skill están aquí, al final, y solo aquí. Los disparadores son ejemplos, no una lista cerrada: el usuario habla en lenguaje natural, con sinónimos, faltas, mayúsculas y frases a medias. Decide por la **intención** y traduce sus palabras con el glosario.
 
 ## Cómo entender al usuario
 
@@ -20,7 +20,7 @@ Lee este mapa antes de actuar. Elige **una** skill y lee solo esa. Los disparado
 | pendiente(s) a secas, qué tengo pendiente, qué falta | lo que requiere atención en todo el sistema | `F5` (incluye las pendientes de detalle) |
 | sin CV, no llegó al umbral, sin currículum | ningún CV base llegaba al umbral (`umbral_afinidad` de `inputs/cv.md`) | `emparejamientos.estado = 'sin_cv'` |
 | CV **rechazado**, falló la validación, lo tumbaron | el CV no pasó la validación | `emparejamientos.estado = 'rechazada'` |
-| rechazo agotado, sin más intentos | agotó los intentos (`intentos_maximos` de `inputs/mensajes/parametros.md`) | `estado = 'rechazada' AND intentos >= 3` |
+| rechazo agotado, sin más intentos | agotó los intentos: la rutina ya no lo reescribe | `estado = 'rechazada'` y no está en la vista `ofertas_por_redactar` |
 | enviados, me llegaron, los que tengo en Telegram | PDF enviado | `emparejamientos.notificado_en IS NOT NULL` |
 | CV, currículum, curriculum, hoja de vida, PDF | el CV a medida | `emparejamientos` (`cv_md`) |
 | oferta, vacante, puesto, anuncio, trabajo, ID, número | una fila de `ofertas` | `ofertas.job_id` |
@@ -57,7 +57,7 @@ Ojo: «rechazada» aplicado a una **oferta** casi siempre significa `descartada`
 - «Quiero candidatarme a 4012345678, prepárame el CV»
 - «Esta sin CV me interesa: 4012345678»
 - «Redacta un CV para Acme, el ID es 4012345678»
-- «Usa el CV de data analytics para la 4012345678»
+- «Usa el CV de <perfil> para la 4012345678»
 - «Vuelve a hacer el CV de 4012345678 desde cero»
 - «Genera CV para estas: 4012…, 4013…, 4014…»
 
@@ -108,9 +108,9 @@ Ojo: «rechazada» aplicado a una **oferta** casi siempre significa `descartada`
 - «¿Cuántas vacantes hay en cada estado?»
 - «¿Por qué motivos se descartaron?» / «agrupa las descartadas por motivo»
 - «¿Qué empresas tienen ofertas aptas?»
-- «Ofertas de Guatemala»
+- «Ofertas de <país>»
 - «Lo que entró esta semana»
-- «Busca ofertas de Power BI»
+- «Busca ofertas de <herramienta o puesto>»
 
 ### F6 · Reenviar PDF
 - «Reenvíame el PDF de 4012345678»

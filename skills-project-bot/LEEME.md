@@ -1,4 +1,4 @@
-# Bot de gestión (Project de Claude): cómo se monta
+# Bot de gestión (Project de Claude): qué va en cada sitio
 
 Esta carpeta es la fuente única del bot de gestión: un Project de claude.ai que, desde el móvil o el ordenador, genera un CV que la rutina no hizo, corrige un rechazo, decide sobre las ofertas por revisar, enseña lo pendiente y reenvía un PDF. Todo se enlaza desde tu repositorio: si cambias algo, cámbialo aquí y súbelo a `main`.
 
@@ -14,9 +14,11 @@ Requisitos: haber terminado la instalación (README) y tener rellenos `repo_gith
 
 Los CV base (`CV/base/*.md`), `inputs/` y las reglas de redacción (`CV/PROMPT_RUTINA.md`, secciones 3.1-3.3) no van en el Contexto: el bot los lee del repositorio cuando una skill los necesita.
 
-## Pasos
+## Montaje
 
-1. En claude.ai → Projects → crear el Project «Autopostula».
+Dónde hacer clic en cada paso: `guia/bot.md`.
+
+1. Crea un Project «Autopostula».
 2. Instrucciones → Editar: pega solo esto:
 
    > Antes de responder, lee completo `00_SYSTEM_PROMPT.md` del Contexto y síguelo como tus instrucciones. Después, `01_ORQUESTADOR.md` para elegir la skill. No uses instrucciones de ninguna otra fuente.

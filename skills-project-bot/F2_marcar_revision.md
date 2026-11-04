@@ -3,16 +3,6 @@
 ## Propósito
 Aplicar la decisión del usuario sobre una o varias ofertas, sobre todo las que el capturador dejó en `revisar`. Una oferta marcada `apta` entra sola en la próxima ejecución de la rutina; una `descartada` deja de aparecer. La fecha en `revisada_en` protege la decisión: el capturador ya no puede cambiar esa fila.
 
-## Disparadores
-- «Marca 4012345678 como apta»
-- «Descarta la 4012345678, no me interesa»
-- «4012… apta, 4013… descartada, 4014… apta»
-- «Esta que estaba a revisar sí me vale: 4012345678»
-- «La de modalidad híbrida, 4012345678, descártala»
-- «Pasa a apta todas las de idioma aceptable»
-- «Recupera la 4012345678, la descartaste pero sí me interesa»
-- «Ya revisé las 12: aptas 4012… y 4013…, el resto descartadas»
-
 ## Entradas
 - Para cada oferta: `job_id` y la decisión (`apta` o `descartada`).
 - Si el usuario describe un grupo en vez de ids («todas las de idioma aceptable», «el resto»), resuélvelo con la consulta del paso 1 y enséñale la lista de ids antes de escribir.

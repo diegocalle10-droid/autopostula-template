@@ -1,16 +1,7 @@
 # F3 · Corregir un CV rechazado
 
 ## Propósito
-Arreglar un CV que la validación automática rechazó, sobre todo cuando ya agotó los intentos de la rutina (`intentos_maximos` de `inputs/mensajes/parametros.md`). Corriges exactamente lo que dice el motivo, revisas el resto de reglas y lo devuelves a `redactada` para que la Action lo valide otra vez.
-
-## Disparadores
-- «Corrige el rechazo de 4012345678»
-- «Arregla el CV de 4012345678, lo rechazaron por la raya larga»
-- «El CV de 4012345678 se pasa de páginas, recórtalo»
-- «¿Por qué rechazaron 4012345678? Arréglalo»
-- «Se agotaron los intentos de 4012345678, corrígelo tú»
-- «Repara los CV rechazados» (lista y corrige uno a uno)
-- «4012345678 tiene un fallo en las fechas, corrígelo»
+Arreglar un CV que la validación automática rechazó, sobre todo cuando ya agotó los intentos de la rutina (regla fija de 3; ver `CLAUDE.md`). Corriges exactamente lo que dice el motivo, revisas el resto de reglas y lo devuelves a `redactada` para que la Action lo valide otra vez.
 
 ## Entradas
 - `job_id`. Para «todos los rechazados», obtén la lista con:
@@ -36,7 +27,7 @@ Arreglar un CV que la validación automática rechazó, sobre todo cuando ya ago
           intentos = LEAST(intentos, 2), emparejado_en = to_char(now() AT TIME ZONE 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
    WHERE job_id = '<JOB_ID>' AND estado = 'rechazada';
    ```
-   `LEAST(intentos, 2)`: si la validación lo vuelve a rechazar, contará como intento 3 y el usuario recibirá el aviso. `rechazo` se queda como está; la Action lo borra al aceptar el CV.
+   `LEAST(intentos, 2)` deja un intento por delante (son 3 en total): si la validación lo vuelve a rechazar, será el último y el usuario recibirá el aviso. `rechazo` se queda como está; la Action lo borra al aceptar el CV.
 6. **Comprueba:**
    ```sql
    SELECT job_id, estado, intentos, length(cv_md) AS caracteres FROM emparejamientos WHERE job_id = '<JOB_ID>';
@@ -46,7 +37,7 @@ Arreglar un CV que la validación automática rechazó, sobre todo cuando ya ago
 
 | El motivo dice… | Corrección |
 |---|---|
-| `ocupa N páginas (máximo 2)` | Recorta lo menos relevante para la oferta hasta quedar claramente por debajo de 1.400 palabras (apunta a unas 1.250). |
+| `ocupa N páginas (máximo 2)` | Recorta lo menos relevante para la oferta hasta quedar con holgura por debajo del tope de palabras de `CV/PROMPT_RUTINA.md` (3.2). |
 | `el texto contiene la raya larga «—»` | Cámbiala por coma, punto, dos puntos o paréntesis en perfil y logros. En cargos, líneas de empresa y fechas, certificaciones y contacto se deja como en el CV base. |
 | `contiene un marcador o texto de plantilla sin resolver: «…»` | Quita lo citado: corchetes `[…]`, llaves `{…}`, cualquier `<…>`, `TODO`, `XXX` o «lorem ipsum». No uses `<` ni `>` en el texto. |
 | `el nombre «…» no coincide` | Copia el nombre (`#`) literal del CV base. |

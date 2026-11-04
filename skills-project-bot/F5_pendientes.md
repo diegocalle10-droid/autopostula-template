@@ -3,17 +3,6 @@
 ## Propósito
 Dar al usuario una foto de lo que requiere su atención y de lo que está en marcha. Solo lectura, **en una sola consulta**.
 
-## Disparadores
-- «¿Qué tengo pendiente?»
-- «¿Qué hay por revisar?»
-- «Lista las ofertas sin CV»
-- «¿Cuántos CV se enviaron hoy?»
-- «¿Hay rechazos agotados?»
-- «¿Qué falta por hacer?» / «¿cómo va todo?»
-- «Resumen del estado del sistema»
-- «¿Qué va a redactar la rutina la próxima vez?»
-- «¿Cuántas aptas hay sin CV?»
-
 ## Pasos
 
 1. **Una consulta para todo** (si el usuario pregunta por un solo grupo, ejecútala igual y muestra solo ese grupo):
@@ -25,10 +14,12 @@ Dar al usuario una foto de lo que requiere su atención y de lo que está en mar
      FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id WHERE e.estado = 'sin_cv'
    UNION ALL
    SELECT 'rechazo_agotado', e.job_id, o.empresa, o.titulo, e.rechazo
-     FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id WHERE e.estado = 'rechazada' AND e.intentos >= 3
+     FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id
+     WHERE e.estado = 'rechazada' AND e.job_id NOT IN (SELECT job_id FROM ofertas_por_redactar)
    UNION ALL
    SELECT 'rechazo_en_curso', e.job_id, o.empresa, o.titulo, concat('intento ', e.intentos, ' · ', e.rechazo)
-     FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id WHERE e.estado = 'rechazada' AND e.intentos < 3
+     FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id
+     WHERE e.estado = 'rechazada' AND e.job_id IN (SELECT job_id FROM ofertas_por_redactar)
    UNION ALL
    SELECT 'esperando_action', e.job_id, o.empresa, o.titulo,
           CASE WHEN e.estado = 'redactada' THEN 'por validar' ELSE 'PDF sin enviar' END

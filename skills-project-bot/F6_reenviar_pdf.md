@@ -3,14 +3,6 @@
 ## Propósito
 Volver a enviar a Telegram el PDF de un CV ya validado, sin cambiar su texto. La Action regenera el PDF desde el Markdown guardado y lo envía con su pie de siempre.
 
-## Disparadores
-- «Reenvíame el PDF de 4012345678»
-- «No me llegó el CV de 4012345678 a Telegram»
-- «Mándame otra vez el PDF de 4012345678»
-- «Borré el mensaje de 4012345678, reenvíalo»
-- «Regenera el PDF de 4012345678 sin cambiar el texto»
-- «Vuelve a mandarme los PDF de 4012… y 4013…»
-
 ## Entradas
 - Uno o varios `job_id`.
 

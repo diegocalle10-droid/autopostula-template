@@ -3,16 +3,6 @@
 ## Propósito
 Contar al usuario todo lo que el sistema sabe de una oferta: datos, estado, por qué está así, su CV y si ya se envió. Solo lectura.
 
-## Disparadores
-- «Enséñame la 4012345678»
-- «¿Cómo está la 4012345678?»
-- «¿Qué pasó con el CV de 4012345678?»
-- «¿Por qué 4012345678 está a revisar?»
-- «Pásame la descripción de 4012345678»
-- «¿Qué CV se eligió para 4012345678 y con qué afinidad?»
-- «Muéstrame el CV que se redactó para 4012345678»
-- «¿Se envió ya el PDF de 4012345678?»
-
 ## Entradas
 - `job_id`. Si el usuario da la empresa o el título en vez del id, búscalo:
   ```sql
@@ -55,7 +45,7 @@ CV: <estado del emparejamiento> · <cv_id> · afinidad <N> %
 | `apta`, sin emparejamiento | La rutina la redactará en su próxima ejecución | Generarla ya con `F1` |
 | `sin_cv` | Ningún CV llegaba al umbral de `inputs/cv.md`; `motivo` dice qué faltaba | Generarla igualmente con `F1` |
 | `redactada` | CV escrito, esperando la Action | Lanzar la Action |
-| `rechazada` | La validación lo rechazó (`rechazo`); con los intentos agotados (`intentos_maximos`) ya no se reintenta | Corregir con `F3` |
+| `rechazada` | La validación lo rechazó (`rechazo`); si ya no está en `ofertas_por_redactar`, agotó los intentos y la rutina no lo reintenta | Corregir con `F3` |
 | `validada` con `notificado_en` | PDF generado y enviado | Reenviar con `F6` si hace falta |
 | `validada` sin `notificado_en` | PDF generado, envío pendiente | Lanzar la Action |
 

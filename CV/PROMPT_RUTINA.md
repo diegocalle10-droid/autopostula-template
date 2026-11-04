@@ -1,4 +1,4 @@
-# RUNBOOK — Rutina de CV a medida (v6, base online)
+# Rutina de CV a medida
 
 > Única fuente de las instrucciones de la rutina de la nube. La rutina solo lleva un prompt mínimo que manda leer este archivo del repositorio clonado y seguirlo literalmente; ningún texto de aquí se copia en la rutina. El Project de gestión usa las secciones 3.1, 3.2 y 3.3 desde aquí.
 
@@ -10,10 +10,10 @@ Alcance: lees el repositorio clonado (`inputs/cv.md` y `CV/base/*.md`) y trabaja
 
 ## 2. Entrada
 
-1. Lee `inputs/cv.md`: tabla de CV base (id, archivo, perfil) y `umbral_afinidad`. Lee también `inputs/mensajes/enlaces.md` (`repo_github`, `neon_project_id`).
+1. Lee `inputs/cv.md`: tabla de CV base (id, archivo, perfil), `umbral_afinidad` y `tope_rutina`. Lee también `inputs/mensajes/enlaces.md` (`repo_github`, `neon_project_id`).
 2. Lee **una sola vez** cada CV base (`CV/base/*.md`). Cada uno es una fuente de verdad independiente: cuenta su propia historia y no tiene por qué coincidir con los demás en fechas, cifras o alcance. Nunca mezcles datos de dos CV en uno.
 3. Haz **una única consulta** al empezar. Trae todos los datos de cada oferta, con la descripción completa, y es la única lectura de ofertas de la ejecución: trabaja solo con ese resultado.
-   `SELECT job_id, titulo, empresa, ubicacion, modalidad, url, descripcion, rechazo, intentos FROM ofertas_por_redactar ORDER BY intentos DESC, job_id LIMIT <tope_rutina>;` (`tope_rutina` está en `inputs/mensajes/parametros.md`)
+   `SELECT job_id, titulo, empresa, ubicacion, modalidad, url, descripcion, rechazo, intentos FROM ofertas_por_redactar ORDER BY intentos DESC, job_id LIMIT <tope_rutina>;`
 4. Si no devuelve filas, ve directamente al cierre (sección 5).
 5. Si una fila trae `rechazo`, es un CV tuyo que no pasó la validación: corrige exactamente lo que dice y vuelve a registrarlo (sección 4).
 

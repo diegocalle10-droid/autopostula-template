@@ -39,7 +39,7 @@ Comprueba cada uno; si falta, ofrécete a instalarlo con `winget` y, tras instal
 
 1. Guía: `guia/neon.md`. El usuario crea la cuenta y el proyecto, y copia la cadena de conexión de **Connect**.
 2. `notepad .env` → la pega en `NEON_DATABASE_URL` y guarda.
-3. Pídele el *Project ID* (Settings → General). Escríbelo en `inputs/mensajes/enlaces.md`: `neon_project_id` y `url_consola_neon` (`https://console.neon.tech/app/projects/<id>/sql-editor`). Commit y push.
+3. Pídele el *Project ID* (dónde está: misma guía). Escríbelo en `inputs/mensajes/enlaces.md`: `neon_project_id` y `url_consola_neon` (`https://console.neon.tech/app/projects/<id>/sql-editor`). Commit y push.
 
 ## 4. Telegram
 
@@ -57,19 +57,19 @@ Comprueba cada uno; si falta, ofrécete a instalarlo con `winget` y, tras instal
 La captura dura varias horas de noche: si Windows suspende o hiberna el PC, se corta sin avisar.
 
 1. Comprueba: `powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE` y `powercfg /query SCHEME_CURRENT SUB_SLEEP HIBERNATEIDLE`. Los índices de corriente alterna (con cargador) y continua (batería) están en segundos en hexadecimal; `0x00000000` es «nunca».
-2. Si alguno es menor que `horas_por_defecto` (`inputs/lotes.md`) más una hora, explícaselo y ofrece una de dos: que lo cambie él (Configuración → Sistema → Inicio/apagado y batería → Pantalla, suspensión e hibernación; guía `guia/energia-windows.md`), o hacerlo tú con su permiso: `powercfg /change standby-timeout-ac 0`, `standby-timeout-dc 0`, `hibernate-timeout-ac 0` y `hibernate-timeout-dc 0`. La pantalla sí puede apagarse. Al terminar la captura el PC se apaga solo, así que no se queda encendido.
-3. En un portátil: enchufado y, si quiere cerrar la tapa, «Al cerrar la tapa: no hacer nada».
-4. Recomienda que las **horas activas** de Windows Update cubran la noche (Configuración → Windows Update → Opciones avanzadas), para que no reinicie a mitad.
+2. Si alguno es menor que `horas_por_defecto` (`inputs/lotes.md`) más una hora, explícaselo y ofrece una de dos: que lo cambie él (guía `guia/energia-windows.md`), o hacerlo tú con su permiso: `powercfg /change standby-timeout-ac 0`, `standby-timeout-dc 0`, `hibernate-timeout-ac 0` y `hibernate-timeout-dc 0`. La pantalla sí puede apagarse. Al terminar la captura el PC se apaga solo, así que no se queda encendido.
+3. En un portátil: enchufado y, si quiere cerrar la tapa, que al cerrarla no haga nada (misma guía).
+4. Recomienda que las **horas activas** de Windows Update cubran la noche, para que no reinicie a mitad (misma guía).
 
 ## 7. Secretos en GitHub
 
-Con `gh` autenticado: `gh secret set -f .env` (sube `NEON_DATABASE_URL`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` sin mostrarlos). Comprueba con `gh secret list`. Sin `gh`: guía `guia/github.md`, sección «Secretos».
+Con `gh` autenticado: `gh secret set -f .env` (sube `NEON_DATABASE_URL`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` sin mostrarlos). Comprueba con `gh secret list`. Sin `gh`, los sube él: guía `guia/github.md`, sección «Secretos».
 
 ## 8. La rutina de CV
 
-1. Token de GitHub (guía `guia/github.md`, sección «Token»): fine-grained, solo su repositorio, permiso **Actions: Read and write**. Lo guarda él; no lo pegues en el chat.
+1. Token de GitHub (guía `guia/github.md`, sección «Token»). Lo guarda él; no lo pegues en el chat.
 2. Conector de Neon en claude.ai (guía `guia/conector-neon.md`).
-3. Rutina (guía `guia/rutina.md`): en claude.ai/code/routines, nueva rutina con su repositorio, las instrucciones de `CV/PROMPT_MINIMO.md`, disparo diario a su `hora_rutina`, el conector de Neon y la variable de entorno `GITHUB_TOKEN_AUTOPOSTULA` con el token.
+3. Rutina (guía `guia/rutina.md`): su repositorio, las instrucciones de `CV/PROMPT_MINIMO.md`, disparo diario a su `hora_rutina`, el conector de Neon y la variable de entorno `GITHUB_TOKEN_AUTOPOSTULA` con el token. Repásalo con él antes de guardarla.
 4. Pídele el enlace de la rutina y escríbelo en `url_rutina` de `inputs/mensajes/enlaces.md`. Commit y push.
 
 ## 9. Bot de gestión (opcional)
@@ -90,4 +90,4 @@ Solo cuando todo lo anterior está hecho. Si algo falla, vuelve al paso que corr
        - cron: "M H * * *"
    ```
    Commit («Activación: envío diario») y push.
-6. Despídete con lo esencial: esta noche, doble clic en `iniciar.bat`, Intro (o las horas que quiera) y a dormir; el PC se apaga solo 25 minutos después de terminar, y a su `hora_rutina` llegan los CV a Telegram.
+6. Despídete con lo esencial: esta noche, doble clic en `iniciar.bat`, Intro (o las horas que quiera) y a dormir; el PC se apaga solo al terminar (pasados `apagar_tras_captura_min` minutos), y a su `hora_rutina` llegan los CV a Telegram.

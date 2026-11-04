@@ -1,8 +1,7 @@
 # Lotes, pausas, cadencias y poda (parámetro de entrada)
 
-Fuente única de los valores operativos. Los rangos se expresan como dos claves (`_min` y `_max`).
-Los valores son conservadores a propósito: LinkedIn trata un ritmo alto como automatizado. Se ajustan con datos reales.
-Regla de trabajo, fijada tras el primer 429 del proyecto (2026-10-31, con dos procesos de peticiones solapados): **entre 60 y 90 segundos por petición** (aleatorio dentro del rango, no una cadencia exacta) y **de 4 a 6 minutos entre lotes**. No hay tope diario: lo que cabe en las horas de `run-continuo --horas H` a este ritmo es el resultado.
+Fuente única de los valores operativos. Los rangos se expresan como dos claves (`_min` y `_max`); cada pausa es aleatoria dentro de su rango, no una cadencia exacta.
+Los valores son conservadores a propósito: LinkedIn trata un ritmo alto como automatizado. No bajes las pausas de 60 s por petición. No hay tope diario: lo que cabe en las horas de la captura a este ritmo es el resultado.
 
 ## Búsqueda
 

@@ -3,16 +3,6 @@
 ## Propósito
 Redactar el CV a medida de una oferta que el usuario elige, **sin umbral de afinidad**: normalmente una que quedó `sin_cv`, una oferta que acaba de marcar como apta o una que quiere rehacer desde cero. El CV queda en `redactada` y la Action lo valida, genera el PDF y lo envía.
 
-## Disparadores
-- «Genera el CV para 4012345678»
-- «Hazme el CV de la oferta 4012345678 aunque no llegue al umbral»
-- «Quiero candidatarme a 4012345678, prepárame el CV»
-- «Esta sin CV me interesa: 4012345678»
-- «Redacta un CV para Acme, el ID es 4012345678»
-- «Usa el CV de data analytics para la 4012345678»
-- «Vuelve a hacer el CV de 4012345678 desde cero»
-- «Genera CV para estas: 4012…, 4013…, 4014…» (repite el proceso para cada id)
-
 ## Entradas
 - `job_id` (obligatorio).
 - CV base preferido (opcional): si el usuario lo nombra, úsalo; si no, elige por afinidad.

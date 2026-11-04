@@ -3,17 +3,6 @@
 ## Propósito
 Responder cualquier pregunta de **lectura** que no cubre otra skill: listas, recuentos, agrupaciones y búsquedas sobre ofertas y CV. Nunca escribe en la base.
 
-## Disparadores
-- «Muéstrame todas las ofertas que estén por revisar»
-- «Hazme una tabla de las pendientes»
-- «¿Cuántas vacantes hay en cada estado?»
-- «¿Por qué motivos se descartaron?» / «agrupa las descartadas por motivo»
-- «¿Qué empresas tienen ofertas aptas?»
-- «Ofertas de Guatemala» / «¿de qué países son las aptas?»
-- «Lo que entró esta semana»
-- «Busca ofertas de Power BI»
-- «¿Cuántos CV sin CV hay?» / «¿qué CV base se usa más?»
-
 ## Pasos
 
 1. **Traduce la pregunta** con el glosario de `01_ORQUESTADOR.md` (por ejemplo «por revisar» → `estado = 'revisar'`).

@@ -65,7 +65,7 @@ Pregunta si busca **remoto, híbrido o presencial** (puede ser más de uno). En 
 
 1. **Zona horaria** (por ejemplo `Europe/Madrid`, `America/Bogota`): `zona_horaria` en `inputs/mensajes/parametros.md`.
 2. **Hora de la rutina de CV** (recomendada las 06:00 de su zona: así los CV están en Telegram al despertar): `hora_rutina` en `inputs/mensajes/enlaces.md`, con su zona (`06:00 (hora de Madrid)`).
-3. **Horas de cada captura**: la lanzará al irse a dormir y tiene que terminar antes de la rutina. Ejemplo: si se acuesta a las 23:00 y la rutina es a las 06:00, como mucho 6. Ponlo en `horas_por_defecto` de `inputs/lotes.md`. El PC se apaga solo 25 minutos después de terminar.
+3. **Horas de cada captura**: la lanzará al irse a dormir y tiene que terminar antes de la rutina. Ejemplo: si se acuesta a las 23:00 y la rutina es a las 06:00, como mucho 6. Ponlo en `horas_por_defecto` de `inputs/lotes.md`. Al terminar, el PC se apaga solo (`apagar_tras_captura_min`).
 
 ## 7. Enlaces
 
