@@ -1,0 +1,30 @@
+name: Algo no funciona
+description: Un error en la captura, la rutina, la Action o la entrevista
+labels: [error]
+body:
+  - type: markdown
+    attributes:
+      value: "No pegues nunca tu `.env`, tokens, tu CV ni datos de ofertas."
+  - type: textarea
+    id: que
+    attributes:
+      label: Qué pasó y qué esperabas
+    validations:
+      required: true
+  - type: dropdown
+    id: donde
+    attributes:
+      label: Dónde
+      options: [Entrevista, Instalación, Captura (PC), Rutina de CV, Action «CV a PDF», Telegram, Bot de gestión]
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Salida de «python cli.py doctor»
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Mensaje de error o últimas líneas de la consola
+      render: text

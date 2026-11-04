@@ -1,0 +1,3 @@
+# Solo el PC de la captura (la Action de los PDF usa requirements.txt)
+-r requirements.txt
+playwright==1.61.0

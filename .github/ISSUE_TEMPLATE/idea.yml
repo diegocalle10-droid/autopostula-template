@@ -1,0 +1,10 @@
+name: Idea o mejora
+description: Algo que haría Autopostula más útil
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Qué te gustaría y para qué
+    validations:
+      required: true

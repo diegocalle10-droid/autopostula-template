@@ -1,0 +1,46 @@
+name: CV a PDF
+
+# La dispara la rutina de la nube al terminar (fuente=rutina) o el usuario a mano. Valida los CV `redactada` en Neon,
+# genera y envía cada PDF por Telegram y, después, los avisos: sin CV, rechazos y el resumen de la rutina.
+# El cron diario de seguridad (reintenta lo pendiente) no viene puesto: lo añade la activación de INSTALAR.md cuando
+# todo lo demás funciona, para que una instalación a medias no falle cada día. Va en UTC.
+on:
+  workflow_dispatch:
+    inputs:
+      fuente:
+        description: "Quién la lanza (con «rutina» se envía además el resumen)"
+        type: choice
+        options: [manual, rutina]
+        default: manual
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cv-pdf
+  cancel-in-progress: false
+
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Validar, generar PDF y avisar
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FUENTE: ${{ github.event_name == 'schedule' && 'cron' || inputs.fuente }}
+        run: python cli.py online-pdf --fuente "$FUENTE"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdf
+          path: CV/pdf
+          if-no-files-found: ignore
+          retention-days: 1

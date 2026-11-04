@@ -1,0 +1,2 @@
+-- Vacía a propósito: los CV a medida viven solo en Neon (`emparejamientos`). Se conserva el número para no romper
+-- la secuencia de migraciones de las bases ya creadas.

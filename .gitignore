@@ -1,0 +1,12 @@
+# Secretos, base local y sesión de LinkedIn: nunca se suben
+.env
+data/
+# PDF: ni los CV generados ni el CV original; solo se admite uno en CV/entrada/ mientras dura la entrevista
+*.pdf
+!CV/entrada/*.pdf
+CV/pdf/
+CV/generados/
+__pycache__/
+*.pyc
+.claude/
+.DS_Store
