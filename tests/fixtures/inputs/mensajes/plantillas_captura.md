@@ -19,6 +19,8 @@ Los envía el PC al terminar `run-continuo` o `detail`, y el protocolo de sesió
 | linkedin_sesion_caducada | la sesión caducó o no existe: inicia sesión en la ventana de Chrome con email y contraseña de LinkedIn (no con Google). |
 | alerta_captura | {emoji} <b>Captura: {titulo}</b>\nHora: {cuando}\n{datos} |
 | alerta_titulo_parada_total | parada total |
+| alerta_titulo_sospecha | parada hasta reanudar |
+| alerta_sospecha | Las búsquedas de control tampoco trajeron lista: puede que LinkedIn haya cambiado la página, que la sesión haya caducado o que haya un bloqueo. La próxima captura lo comprueba con una búsqueda y, si funciona, sigue sola. Si lo arreglas antes: python cli.py reanudar |
 | alerta_titulo_limite | límite de LinkedIn (429) |
 | alerta_titulo_detenida | detenida antes de tiempo |
 | alerta_titulo_subida | subida a Neon fallida |

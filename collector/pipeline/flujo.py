@@ -51,6 +51,8 @@ class Flujo:
         return seleccion.seleccionar(ofertas_repo.pendientes_de_detalle(self.con), self.cfg).total_elegibles
 
     def _siguiente(self, elegibles: int) -> str:
+        if breaker.hay_parada_por_sospecha(self.con, self.reloj()):
+            return BUSQUEDA   # la búsqueda de control con la que arranca la tanda decide si se sigue
         if elegibles > self.n or (self._agenda_vacia and elegibles > 0):
             return DETALLE
         return BUSQUEDA
@@ -107,7 +109,7 @@ class Flujo:
         if self._fallos_detalle < maximo:
             return True
         with transaccion(self.con):
-            breaker.parar_por_fallos(self.con, self.cfg, self.reloj(), f"{maximo} fallos seguidos en el detalle")
+            breaker.parar_por_sospecha(self.con, self.reloj(), f"{maximo} fallos seguidos en el detalle")
         self.res.motivo = "fallos seguidos en el detalle"
         return False
 

@@ -34,3 +34,24 @@ def hubo_resultados_alguna_vez(con: sqlite3.Connection) -> bool:
 
 def registrar_hallazgo(con: sqlite3.Connection, job_id: str, consulta_id: int) -> None:
     con.execute("INSERT OR IGNORE INTO hallazgos (job_id, consulta_id) VALUES (?, ?)", (job_id, consulta_id))
+
+
+def racha_fallida(con: sqlite3.Connection, tope: int = 200) -> List[sqlite3.Row]:
+    """Las últimas consultas seguidas que fallaron (sin ser 429), de la más reciente hacia atrás."""
+    racha = []
+    for c in con.execute("SELECT * FROM consultas ORDER BY consulta_id DESC LIMIT ?", (tope,)):
+        if c["resultado"] != "fallida":
+            break
+        racha.append(c)
+    return racha
+
+
+def combinaciones_de_control(con: sqlite3.Connection, excluir: List[int], n: int) -> List[sqlite3.Row]:
+    """Las `n` combinaciones activas que más recientemente devolvieron ofertas, sin las de `excluir`."""
+    fuera = f"AND c.combinacion_id NOT IN ({','.join('?' * len(excluir))})" if excluir else ""
+    return con.execute(
+        f"""SELECT c.* FROM combinaciones c
+            JOIN (SELECT combinacion_id, MAX(consulta_id) AS ultima FROM consultas
+                  WHERE resultado = 'ok' AND n_resultados > 0 GROUP BY combinacion_id) q USING (combinacion_id)
+            WHERE c.activa = 1 {fuera}
+            ORDER BY q.ultima DESC LIMIT ?""", (*excluir, n)).fetchall()

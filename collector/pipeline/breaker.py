@@ -6,19 +6,28 @@ from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
 from collector.config.modelos import Config
-from collector.db import consultas_repo, eventos_repo
+from collector.db import eventos_repo
 from collector.db.connection import transaccion
 from collector.util.reloj import a_iso, inicio_dia_local, inicio_dia_siguiente_local
 
 
-LISTA_SIN_TARJETAS = "LISTA_SIN_TARJETAS"   # fallo de la página de esa combinación: se salta, no pausa la ejecución
+LISTA_SIN_TARJETAS = "LISTA_SIN_TARJETAS"   # fallo de la página de esa combinación: se pide otra vez y se salta
+MARCA_SOSPECHA = "[parada_sospecha]"
+SIN_PLAZO = "9999-12-31T00:00:00Z"            # la parada por sospecha no caduca sola
 
 
 def puede_ejecutar(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> Tuple[bool, str]:
     pausa = eventos_repo.pausa_activa(con, a_iso(ahora))
+    if pausa and pausa["pausa_hasta"] == SIN_PLAZO:
+        return False, f"parada hasta reanudar: {pausa['contexto']}"
     if pausa:
         return False, f"pausa activa por «{pausa['tipo']}» hasta {pausa['pausa_hasta']}"
     return True, ""
+
+
+def en_horario_permitido(cfg: Config, ahora: datetime) -> bool:
+    """Sin franja horaria: la captura dura las horas que se le piden (`horas_por_defecto`)."""
+    return True
 
 
 def registrar_limite(con: sqlite3.Connection, cfg: Config, ahora: datetime, contexto: str) -> str:
@@ -39,36 +48,15 @@ def parar_por_limite(con: sqlite3.Connection, cfg: Config, ahora: datetime, cont
     return f"429/desafío anti-bot ({accion})"
 
 
-def _pausar(con: sqlite3.Connection, cfg: Config, ahora: datetime, tipo: str, contexto: str, clave_horas: str) -> None:
-    hasta = ahora + timedelta(hours=cfg.lotes.entero(clave_horas))
-    eventos_repo.registrar(con, tipo, a_iso(ahora), contexto, a_iso(hasta))
+def parar_por_sospecha(con: sqlite3.Connection, ahora: datetime, contexto: str) -> None:
+    """Parada sin plazo: algo falla en todo el sistema (no en una combinación). Solo la levanta `reanudar` o la búsqueda
+    de control con la que arranca la siguiente captura. El contexto no debe empezar por «detail »: ese prefijo cuenta
+    como petición de detalle."""
+    eventos_repo.registrar(con, "fallo", a_iso(ahora), f"{contexto} {MARCA_SOSPECHA}", SIN_PLAZO)
 
 
-def revisar_vacios(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> bool:
-    """N consultas seguidas vacías, habiendo devuelto datos antes: posible cambio de HTML o bloqueo blando."""
-    n = cfg.lotes.entero("vacios_seguidos_para_alerta")
-    ultimas = consultas_repo.ultimas(con, n)
-    if len(ultimas) < n or any(u["resultado"] != "vacia" for u in ultimas):
-        return False
-    if not consultas_repo.hubo_resultados_alguna_vez(con):
-        return False
-    _pausar(con, cfg, ahora, "vacios_repetidos", f"{n} consultas vacías seguidas", "pausa_tras_vacios_horas")
-    return True
-
-
-def revisar_fallos(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> bool:
-    """N consultas seguidas fallidas (sin ser 429 ni lista sin tarjetas, que solo salta la combinación): pausa."""
-    n = cfg.lotes.entero("fallos_seguidos_para_parada")
-    ultimas = consultas_repo.ultimas(con, n)
-    if len(ultimas) < n or any(u["resultado"] != "fallida" or u["codigo_error"] == LISTA_SIN_TARJETAS for u in ultimas):
-        return False
-    parar_por_fallos(con, cfg, ahora, f"{n} fallos seguidos")
-    return True
-
-
-def parar_por_fallos(con: sqlite3.Connection, cfg: Config, ahora: datetime, contexto: str) -> None:
-    """Pausa por fallos seguidos (sin ser 429). El contexto no debe empezar por «detail »: ese prefijo cuenta como petición de detalle."""
-    _pausar(con, cfg, ahora, "fallo", contexto, "pausa_tras_fallos_horas")
+def hay_parada_por_sospecha(con: sqlite3.Connection, ahora: datetime) -> Optional[sqlite3.Row]:
+    return eventos_repo.pausa_activa_con(con, a_iso(ahora), MARCA_SOSPECHA)
 
 
 def hay_parada_total(con: sqlite3.Connection, ahora: datetime) -> Optional[sqlite3.Row]:

@@ -184,12 +184,6 @@ class Disyuntor(Base):
         self.assertIsNone(obtener_combinacion(self.con, 1)["ultima_ejecucion"])
         self.assertIsNotNone(obtener_combinacion(self.con, 2)["ultima_ejecucion"])
 
-    def test_vacios_seguidos_activan_la_alerta(self):
-        self.tanda(CliFalso([[oferta(1)]]), 1)                       # hubo datos alguna vez
-        r = self.tanda(CliFalso([[], [], []]), 3)
-        self.assertIn("disyuntor", r.detenida_por)
-        self.assertIsNotNone(eventos_repo.pausa_activa(self.con, a_iso(self.reloj())))
-
 
 class Detalle(Base):
     def _preparar(self, detalles):

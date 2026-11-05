@@ -18,7 +18,7 @@ Los valores son conservadores a propósito: LinkedIn trata un ritmo alto como au
 | umbral_pagina_perfil | 0.3 | proporción | Y solo si al menos esta proporción de los títulos de la actual pasa el filtro de `prefiltro.md`: en los mercados pequeños LinkedIn rellena las páginas siguientes con anuncios sin relación |
 | margen_jobage_dias | 1 | días | Se suma al tiempo desde la última pasada |
 | reintento_fallida_horas | 1 | h | Si una combinación falla (sin ser 429), se reintenta pasado este tiempo |
-| fallos_por_combinacion_para_saltar | 2 | intentos | Una lista sin tarjetas en la primera página se pide otra vez hasta este número de intentos; después se salta a la siguiente combinación sin pausar la ejecución ni contar para `fallos_seguidos_para_parada` |
+| fallos_por_combinacion_para_saltar | 2 | intentos | Una lista sin tarjetas en la primera página se pide otra vez hasta este número de intentos; después se salta a la siguiente combinación (y cuenta para `sospechas_para_control`) |
 
 ## Detalle
 
@@ -65,10 +65,9 @@ Acciones: `pausa` (espera `horas`), `hasta_manana` y `parada_total` (espera `hor
 
 | clave | valor | unidad | nota |
 |---|---|---|---|
-| vacios_seguidos_para_alerta | 3 | consultas | En combinaciones que antes devolvían datos |
-| pausa_tras_vacios_horas | 3 | h | |
-| fallos_seguidos_para_parada | 3 | peticiones | Búsquedas o detalles seguidos que fallan sin ser 429 |
-| pausa_tras_fallos_horas | 3 | h | |
+| sospechas_para_control | 3 | combinaciones | Combinaciones seguidas cuya búsqueda falla sin ser 429 (no un vacío que confirma LinkedIn): se pasa a las búsquedas de control |
+| busquedas_de_control | 3 | búsquedas | Combinaciones que hace poco trajeron ofertas y se repiten para comprobar si el sistema funciona. Si alguna trae lista, se sigue; si ninguna, parada sin plazo y aviso por Telegram. La siguiente captura empieza con una búsqueda de control y, si trae lista, levanta la parada sola; si no, `python cli.py reanudar` tras arreglarlo |
+| fallos_seguidos_para_parada | 3 | detalles | Detalles seguidos que fallan sin ser 429: parada sin plazo, como la de las búsquedas de control |
 | fallos_por_oferta_para_descartar | 2 | intentos | Una oferta cuyo detalle llega sin contenido este número de veces se descarta con la regla `detalle_ilegible` de `decisiones.md` y se sigue con la siguiente |
 
 ## Poda

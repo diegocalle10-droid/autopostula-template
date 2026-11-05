@@ -92,7 +92,10 @@ def status(args) -> int:
           f"por descartar por título {ingest.por_descartar_por_titulo(con, cfg)}")
     print(f"Ofertas por estado: {ofertas_repo.contar_por_estado(con) or 'ninguna'}")
     pausa = eventos_repo.pausa_activa(con, reloj.a_iso(ahora))
-    print("Disyuntor: " + (f"PAUSADO por «{pausa['tipo']}» hasta {pausa['pausa_hasta']} ({pausa['contexto']})" if pausa else "libre"))
+    if pausa and pausa["pausa_hasta"] == breaker.SIN_PLAZO:
+        print(f"Disyuntor: PARADO hasta reanudar ({pausa['contexto']}). La próxima captura lo comprueba con una búsqueda de control.")
+    else:
+        print("Disyuntor: " + (f"PAUSADO por «{pausa['tipo']}» hasta {pausa['pausa_hasta']} ({pausa['contexto']})" if pausa else "libre"))
     return 0
 
 

@@ -92,7 +92,7 @@ def procesar_detalles(con: sqlite3.Connection, cfg: Config, cli, ritmo: Ritmo,
             fallos += 1
             if fallos >= maximo:
                 with transaccion(con):
-                    breaker.parar_por_fallos(con, cfg, ahora, f"{maximo} fallos seguidos en el detalle")
+                    breaker.parar_por_sospecha(con, ahora, f"{maximo} fallos seguidos en el detalle")
                 res.detenida_por = "fallos seguidos en el detalle"
                 break
             continue
