@@ -18,6 +18,7 @@ Los valores son conservadores a propósito: LinkedIn trata un ritmo alto como au
 | umbral_pagina_perfil | 0.3 | proporción | Y solo si al menos esta proporción de los títulos de la actual pasa el filtro de `prefiltro.md`: en los mercados pequeños LinkedIn rellena las páginas siguientes con anuncios sin relación |
 | margen_jobage_dias | 1 | días | Se suma al tiempo desde la última pasada |
 | reintento_fallida_horas | 1 | h | Si una combinación falla (sin ser 429), se reintenta pasado este tiempo |
+| fallos_por_combinacion_para_saltar | 2 | intentos | Una lista sin tarjetas en la primera página se pide otra vez hasta este número de intentos; después se salta a la siguiente combinación sin pausar la ejecución ni contar para `fallos_seguidos_para_parada` |
 
 ## Detalle
 

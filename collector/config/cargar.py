@@ -18,7 +18,7 @@ from collector.util.texto import normalizar, patron
 CLAVES_LOTES = (
     "consultas_por_lote", "pausa_entre_consultas_min",
     "pausa_entre_consultas_max", "pausa_entre_lotes_min", "pausa_entre_lotes_max", "jobage_dias_primer_barrido",
-    "max_paginas", "umbral_pagina_nuevas", "umbral_pagina_perfil", "margen_jobage_dias", "reintento_fallida_horas", "detail_por_lote", "detalles_pendientes_max",
+    "max_paginas", "umbral_pagina_nuevas", "umbral_pagina_perfil", "margen_jobage_dias", "reintento_fallida_horas", "fallos_por_combinacion_para_saltar", "detail_por_lote", "detalles_pendientes_max",
     "pausa_entre_detail_min", "pausa_entre_detail_max", "pausa_entre_lotes_detail_min",
     "pausa_entre_lotes_detail_max", "horas_por_defecto", "bloqueo_caduca_horas", "apagar_tras_captura_min",
     "vacios_seguidos_para_alerta", "pausa_tras_vacios_horas", "fallos_seguidos_para_parada", "fallos_por_oferta_para_descartar",
