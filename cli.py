@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from collector.comandos import datos, ejecucion, instalacion, online
+from collector.comandos import datos, ejecucion, geoids, instalacion, online
 from collector.config.modelos import ConfigError
 
 RAIZ = Path(__file__).resolve().parent
@@ -45,6 +45,7 @@ def _parser() -> argparse.ArgumentParser:
                    help="ofertas elegibles sin detalle que se toleran antes de buscar (por defecto, inputs/lotes.md)")
     c.add_argument("--dry-run", action="store_true", help="solo muestra qué haría")
     c.set_defaults(f=ejecucion.run_continuo)
+    _comando_geoids(sub)
     _comandos_online(sub)
     return p
 
@@ -56,6 +57,15 @@ def _comandos_instalacion(sub) -> None:
     pt.add_argument("titulos", nargs="+", help="títulos entre comillas")
     pt.set_defaults(f=instalacion.probar_titulos)
     sub.add_parser("telegram-chat-id", help="muestra el TELEGRAM_CHAT_ID tras escribirle a tu bot").set_defaults(f=instalacion.telegram_chat_id)
+
+
+def _comando_geoids(sub) -> None:
+    g = sub.add_parser("geoids", help="resuelve con LinkedIn el geo_id de las ubicaciones de inputs/ubicaciones.md")
+    g.add_argument("frases", nargs="*", help="frases concretas (por defecto, las que no tienen geo_id)")
+    g.add_argument("--todas", action="store_true", help="comprueba también las que ya tienen geo_id")
+    g.add_argument("--escribir", action="store_true", help="guarda en ubicaciones.md los geo_id fiables")
+    g.add_argument("--dry-run", action="store_true", help="solo muestra qué ubicaciones resolvería")
+    g.set_defaults(f=geoids.geoids_cmd)
 
 
 def _comandos_online(sub) -> None:

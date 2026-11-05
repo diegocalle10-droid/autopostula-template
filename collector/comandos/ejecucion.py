@@ -33,6 +33,17 @@ def _ritmo(cfg, prefijo: str, lote: int) -> Ritmo:
                  (l.entero(f"pausa_entre_lotes{sufijo}_min"), l.entero(f"pausa_entre_lotes{sufijo}_max")))
 
 
+SALIDA_CONFIG = 3
+
+
+def _sin_geo_id(cfg) -> bool:
+    """Sin geo_id la lista aplica la ubicación de la cuenta: se avisa antes de gastar ninguna petición."""
+    faltan = [u.frase for u in cfg.ubicaciones if not u.geo_id]
+    if faltan:
+        print(f"No se ejecuta: faltan geo_id en ubicaciones.md para {', '.join(faltan)}. Ejecuta «python cli.py geoids --escribir».")
+    return bool(faltan)
+
+
 def _con_bloqueo(args, cfg, accion) -> int:
     """Ejecuta `accion` si no hay otra ejecución en curso."""
     try:
@@ -74,6 +85,8 @@ def run(args) -> int:
             print(f"[simulacro] P{c['prioridad']}  {c['termino']!r} @ {c['ubicacion_frase']}")
         print("[simulacro] no se ha hecho ninguna petición.")
         return 0
+    if _sin_geo_id(cfg):
+        return SALIDA_CONFIG
     return _con_bloqueo(args, cfg, lambda: _tanda(args, cfg, con, maximo))
 
 
@@ -136,6 +149,8 @@ def run_continuo(args) -> int:
               f"se descartarían por título: {ingest.por_descartar_por_titulo(con, cfg)}")
         print(f"[simulacro] primera petición: {'detalle' if elegibles > n else 'búsqueda'}; no se ha hecho ninguna.")
         return 0
+    if _sin_geo_id(cfg):
+        return SALIDA_CONFIG
     args.horas = captura.preguntar_horas(args.horas, cfg.lotes.decimal("horas_por_defecto"))
     return _con_bloqueo(args, cfg, lambda: _flujo(args, cfg, con))
 

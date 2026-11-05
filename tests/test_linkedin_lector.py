@@ -79,12 +79,30 @@ class Buscar(unittest.TestCase):
         self.assertEqual([o["title"] for o in ofertas], ["Analista 1", "Analista 2"])
         self.assertIn("f_AL=true", f._page.visitas[0])
         self.assertIn("business+analyst", f._page.visitas[0])
+        self.assertIn("geoId=103323778", f._page.visitas[0])   # sin geoId la lista aplica la ubicación de la cuenta
+
+    def test_una_ubicacion_sin_geo_id_falla_sin_navegar(self):
+        f = lector()
+        with self.assertRaises(LinkedinError) as e:
+            f.buscar("x", "Atlantida", 30, "2", 1)
+        self.assertEqual(e.exception.codigo, "SIN_GEOID")
+        self.assertEqual(f._page.visitas, [])
 
     def test_las_tarjetas_repetidas_en_varias_lecturas_se_acumulan_sin_duplicar(self):
         f = lector(tandas=[[_tarjeta(1), _tarjeta(2)], [_tarjeta(1), _tarjeta(2), _tarjeta(3)]])
         ofertas = f._cargar_tarjetas()
         self.assertEqual(len(ofertas), 3)
         self.assertGreater(f._page.desplazamientos, 0)
+
+    def test_tras_el_aviso_de_resultados_relacionados_no_cuentan_ni_hay_mas_paginas(self):
+        f = lector(tandas=[[_tarjeta(1) + [False], _tarjeta(2) + [False], _tarjeta(3) + [True], _tarjeta(4) + [True]]])
+        ofertas = f.buscar("x", "Mexico", 30, "2", 1)
+        self.assertEqual([o["id"] for o in ofertas], ["1", "2"])
+        self.assertEqual(f.buscar("x", "Mexico", 30, "2", 2), [])   # sin buscar el botón de la página 2
+
+    def test_solo_resultados_relacionados_es_una_pagina_vacia(self):
+        f = lector(tandas=[[_tarjeta(1) + [True], _tarjeta(2) + [True]]])
+        self.assertEqual(f.buscar("x", "Mexico", 30, "2", 1), [])
 
     def test_una_tarjeta_sin_pintar_se_pide_otra_vez_al_bajar(self):
         f = lector(tandas=[[_tarjeta(1), ["2", "  "]], [_tarjeta(1), _tarjeta(2)]])

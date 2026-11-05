@@ -45,7 +45,8 @@
 ## 3. Dónde buscas
 
 1. Pregunta en qué lugares: países, regiones o ciudades (por ejemplo, «solo Madrid», «toda España», «Canarias», «Latinoamérica»). No hay ninguno por defecto.
-2. Escribe la tabla «Lugares» de `inputs/ubicaciones.md`: `frase` con el nombre que entiende LinkedIn (en inglés si hay duda: `Spain`, `Canary Islands`, `Mexico`), `tipo` y `pais_esperado` (el país como aparece en LinkedIn; `-` en una región de varios países).
+2. Escribe la tabla «Lugares» de `inputs/ubicaciones.md`: `frase` con el nombre que entiende LinkedIn (en inglés si hay duda: `Spain`, `Canary Islands`, `Mexico`), `tipo`, `pais_esperado` (el país como aparece en LinkedIn; `-` en una región de varios países) y `geo_id` = `-`.
+   - **El `geo_id` no se escribe a mano ni se inventa.** LinkedIn ignora el texto de la ubicación y solo respeta su identificador; lo busca `python cli.py geoids --escribir`, que necesita la sesión de LinkedIn abierta en el PC. Si estás en su PC y la instalación ya está hecha (`python cli.py sesion` funciona), ejecútalo ahora y revisa el resultado con el usuario (ver `INSTALAR.md`, paso 5). Si no, déjalo en `-` y avísale de que se resuelve en la instalación: hasta entonces la captura no arranca.
 3. «Países aceptados»: los países donde acepta trabajar (al menos los de sus lugares), con `prioridad_detalle` 1. Si busca en una región amplia, pregunta si hay países de esa región que no le valen y ponlos en «Países excluidos».
 
 ## 4. Modalidad

@@ -7,41 +7,41 @@ Reglas:
 - Una ubicación que falla (0 resultados) o es redundante con otra se **elimina** de la tabla.
 - La tabla **Reserva** no la lee el código: son capitales y siglas pendientes de medir en producción.
 - `frase` es el texto exacto que se envía a LinkedIn como ubicación. LinkedIn **no reconoce los nombres en español**: se usan los nombres en inglés.
+- `geo_id` es el identificador de LinkedIn de la ubicación: la nueva lista de búsqueda ignora el texto de la ubicación y aplica la de la cuenta si no recibe `geoId`. Resuelto con el desplegable de ubicación y validado el 2026-11-05 (el desplegable muestra el país y las tarjetas son de ese país).
 - `pais_esperado` es el texto que debe aparecer en la ubicación de los resultados.
 - Una oferta solo se acepta si su país está en la tabla **Países aceptados**. Esto deja fuera, por ejemplo, a Brasil cuando una búsqueda regional lo devuelve.
 
 ## Países
 
-| tipo | frase | pais_esperado | nota |
-|---|---|---|---|
-| pais | Mexico | Mexico |  |
-| pais | Guatemala | Guatemala |  |
-| pais | Honduras | Honduras |  |
-| pais | El Salvador | El Salvador |  |
-| pais | Nicaragua | Nicaragua |  |
-| pais | Costa Rica | Costa Rica |  |
-| pais | Panama | Panama |  |
-| pais | Dominican Republic | Dominican Republic |  |
-| pais | Puerto Rico | Puerto Rico |  |
-| pais | Colombia | Colombia |  |
-| pais | Venezuela | Venezuela |  |
-| pais | Ecuador | Ecuador |  |
-| pais | Peru | Peru |  |
-| pais | Bolivia | Bolivia |  |
-| pais | Chile | Chile | 9/10 Chile, 1 con "Santiago Metropolitan Area" (el filtro de país debe aceptar áreas metropolitanas) |
-| pais | Argentina | Argentina |  |
-| pais | Uruguay | Uruguay |  |
-| pais | Paraguay | Paraguay |  |
-| pais | Equatorial Guinea | Equatorial Guinea | poco volumen esperado |
+| tipo | frase | pais_esperado | geo_id | nota |
+|---|---|---|---|---|
+| pais | Mexico | Mexico | 103323778 |  |
+| pais | Guatemala | Guatemala | 100877388 |  |
+| pais | Honduras | Honduras | 101937718 |  |
+| pais | El Salvador | El Salvador | 106522560 |  |
+| pais | Nicaragua | Nicaragua | 105517145 |  |
+| pais | Costa Rica | Costa Rica | 101739942 |  |
+| pais | Panama | Panama | 100808673 |  |
+| pais | Dominican Republic | Dominican Republic | 105057336 |  |
+| pais | Puerto Rico | Puerto Rico | 105245958 |  |
+| pais | Colombia | Colombia | 100876405 |  |
+| pais | Venezuela | Venezuela | 101490751 |  |
+| pais | Ecuador | Ecuador | 106373116 |  |
+| pais | Peru | Peru | 102927786 |  |
+| pais | Bolivia | Bolivia | 104379274 |  |
+| pais | Chile | Chile | 104621616 | 9/10 Chile, 1 con "Santiago Metropolitan Area" (el filtro de país debe aceptar áreas metropolitanas) |
+| pais | Argentina | Argentina | 100446943 |  |
+| pais | Uruguay | Uruguay | 100867946 |  |
+| pais | Paraguay | Paraguay | 104065273 |  |
+| pais | Equatorial Guinea | Equatorial Guinea | 105141335 | poco volumen esperado |
 
 ## Regiones
 
-Solo 2 de 17 variantes funcionan como región. Cobertura de Centroamérica, Caribe y Cono Sur: se logra con los países individuales de la tabla anterior.
+Solo «Latin America» funciona como región en la nueva lista: «South America» se eliminó el 2026-11-05 porque el desplegable de ubicación no la ofrece. Cobertura de Centroamérica, Caribe y Cono Sur: se logra con los países individuales de la tabla anterior.
 
-| tipo | frase | pais_esperado | nota |
-|---|---|---|---|
-| region | Latin America | - | Mezcla Brasil, Uruguay, Puerto Rico, México y otros: aplicar filtro de países aceptados |
-| region | South America | - | Solo 4 de 10 ids en común con "Latin America": aporta ofertas distintas |
+| tipo | frase | pais_esperado | geo_id | nota |
+|---|---|---|---|---|
+| region | Latin America | - | 91000011 | Mezcla Brasil, Uruguay, Puerto Rico, México y otros: aplicar filtro de países aceptados |
 
 ## Reserva (capitales y siglas)
 
@@ -78,6 +78,11 @@ En una búsqueda de un país, una ubicación sin nombre de país («Santiago Met
 | Paraguay | 1 |
 | Equatorial Guinea | 1 |
 | Latin America | 1 |
+| República Dominicana | 1 |
+| Guinea Ecuatorial | 1 |
+| América Latina | 1 |
+
+Las tres últimas son los nombres en español con que la lista de LinkedIn muestra esos lugares (los demás coinciden al quitar tildes).
 
 `prioridad_detalle` (1 = primero) ordena a qué ofertas se les pide antes el detalle (ver `prefiltro.md`). 
 
@@ -87,7 +92,7 @@ Países que aparecen en búsquedas regionales y se sabe que no valen. La lista c
 
 | pais | nota |
 |---|---|
-| Brazil | No es hispanohablante; sale en "Latin America" y "South America" |
+| Brazil | No es hispanohablante; sale en "Latin America" |
 | Brasil | Variante en español |
-| Spain | Excluida en este ejemplo: no se busca ni se acepta |
+| Spain | Retirada del todo por decisión de Diego (2026-10-31): no se busca ni se acepta |
 | España | Variante en español |

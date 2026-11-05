@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Dict, FrozenSet, List, Sequence, Tuple
+from typing import Dict, FrozenSet, List, Optional, Sequence, Tuple
 
 from collector.config.modelos import (
     Config, ConfigCv, ConfigDecisiones, ConfigError, ConfigIdioma, ConfigModalidad, ConfigPrefiltro, CvBase, Escalon429,
@@ -77,13 +77,22 @@ def _sin_guion_inicial(textos: Sequence[str], archivo: str) -> None:
             raise ConfigError(f"{archivo}: «{t}» no puede empezar por «-»")
 
 
+def _geo_id(valor: str, frase: str) -> Optional[str]:
+    """Vacío o «-»: aún sin resolver (`python cli.py geoids --escribir`). Si hay valor, son solo dígitos."""
+    if valor in ("", "-"):
+        return None
+    if not valor.isdigit():
+        raise ConfigError(f"ubicaciones.md: el geo_id de {frase} debe ser un número («{valor}»)")
+    return valor
+
+
 def _ubicaciones(carpeta: Path):
     t = _archivo(carpeta, "ubicaciones.md")
     activas: List[Ubicacion] = []
     for seccion in (s for s in ("lugares", "paises", "regiones") if t.get(s)):
-        for f in _tabla(t, seccion, "ubicaciones.md", ("tipo", "frase", "pais_esperado")):
+        for f in _tabla(t, seccion, "ubicaciones.md", ("tipo", "frase", "pais_esperado", "geo_id")):
             esperado = None if f["pais_esperado"] in ("", "-") else f["pais_esperado"]
-            activas.append(Ubicacion(f["tipo"], f["frase"], esperado))
+            activas.append(Ubicacion(f["tipo"], f["frase"], esperado, _geo_id(f["geo_id"], f["frase"])))
     if not activas:
         raise ConfigError("ubicaciones.md: la tabla «Lugares» está vacía; añade al menos un lugar donde buscar")
     filas = _tabla(t, "paises_aceptados", "ubicaciones.md", ("pais", "prioridad_detalle"))

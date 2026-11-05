@@ -25,6 +25,7 @@ class LinkedinSesion:
         self._perfil = self._raiz.joinpath(*PERFIL)
         self._pw = self._ctx = self._page = None
         self._lugar: Optional[tuple] = None   # (búsqueda, página) donde se quedó la lista
+        self._fin_lista = False                # la página trajo el aviso de «resultados relacionados»: no hay más
 
     def __enter__(self) -> "LinkedinSesion":
         self.abrir()
@@ -55,7 +56,11 @@ class LinkedinSesion:
     def buscar(self, termino: str, ubicacion: str, jobage_dias: int, filtro_modalidad: str, pagina: int) -> List[dict]:
         busqueda = (termino, ubicacion, jobage_dias, filtro_modalidad)
         if pagina == 1:
-            self._ir(lectura.url_busqueda(termino, ubicacion, filtro_modalidad, jobage_dias))
+            ubic = self._cfg.ubicacion_por_frase(ubicacion)
+            if ubic is None or not ubic.geo_id:
+                raise LinkedinError("SIN_GEOID", f"«{ubicacion}» no tiene geo_id en ubicaciones.md (python cli.py geoids)")
+            self._fin_lista = False
+            self._ir(lectura.url_busqueda(termino, ubicacion, filtro_modalidad, jobage_dias, ubic.geo_id))
         elif not self._pasar_pagina(busqueda, pagina):
             return []
         self._lugar = (busqueda, pagina)
@@ -101,16 +106,19 @@ class LinkedinSesion:
         """Pasa a la página con el botón de la paginación, como una persona. False si no hay más páginas."""
         if self._lugar != (busqueda, pagina - 1):
             raise LinkedinError("PAGINA_FUERA_DE_SECUENCIA", f"se pidió la página {pagina} sin haber leído la anterior")
+        if self._fin_lista:
+            return False
         boton = self._page.locator(f'button[aria-label="Página {pagina}"], button[aria-label="Page {pagina}"]')
-        self._page.evaluate("s => document.querySelector(s)?.scrollIntoView({block: 'end'})", ".jobs-search-pagination")
+        self._page.evaluate("s => document.querySelector(s)?.scrollIntoView({block: 'end'})", lectura.PAGINACION)
         self._page.wait_for_timeout(random.uniform(800, 1600))
         if boton.count() == 0:
             return False
-        primera = self._page.evaluate(f"() => document.querySelector('{lectura.TARJETA}')?.dataset.occludableJobId")
+        primera = self._page.evaluate(f"s => {{ const e = document.querySelector(s); return e && ({lectura.ID_JS})(e); }}",
+                                      lectura.TARJETA)
         boton.first.click()
         try:
-            self._page.wait_for_function(f"p => document.querySelector('{lectura.TARJETA}')?.dataset.occludableJobId !== p",
-                                         arg=primera, timeout=25000)
+            self._page.wait_for_function(f"([s, p]) => {{ const e = document.querySelector(s); return e && ({lectura.ID_JS})(e) !== p; }}",
+                                         arg=[lectura.TARJETA, primera], timeout=25000)
         except Exception:
             raise LinkedinError("PAGINA_NO_CAMBIO", f"la página {pagina} no cambió") from None
         return True
@@ -127,22 +135,24 @@ class LinkedinSesion:
         return self._cargar_tarjetas()
 
     def _cargar_tarjetas(self) -> List[dict]:
-        """La lista solo pinta las tarjetas a la vista: baja poco a poco y las acumula hasta tener las de la página."""
+        """La lista solo pinta las tarjetas a la vista: baja poco a poco y las acumula hasta tener las de la página.
+        Las que van tras el aviso de «resultados relacionados» no cumplen los filtros: no cuentan y no hay más páginas."""
         vistas: dict = {}
         total = estables = 0
         for _ in range(60):
-            crudas = self._page.evaluate("s => [...document.querySelectorAll(s)].map(e => [e.dataset.occludableJobId, e.innerText])",
-                                         lectura.TARJETA)
-            for job_id, texto in crudas:
+            crudas = self._page.evaluate(lectura.TARJETAS_JS, lectura.TARJETA)
+            exactas = [c for c in crudas if not (len(c) > 2 and c[2])]
+            self._fin_lista = len(exactas) < len(crudas)
+            for job_id, texto, *_ in exactas:
                 t = lectura.tarjeta(job_id, texto, self._cfg.modalidad.etiquetas, self._ahora())
                 if t and job_id not in vistas:
                     vistas[job_id] = t
-            falta = next((i for i, _ in crudas if i not in vistas), None)
+            falta = next((c[0] for c in exactas if c[0] not in vistas), None)
             estables = estables + 1 if (len(crudas) == total and falta is None) else 0
             total = len(crudas)
-            if estables >= 2 or len(vistas) >= lectura.POR_PAGINA:
+            if estables >= 2 or len(vistas) >= lectura.POR_PAGINA or (self._fin_lista and falta is None):
                 break
-            self._page.evaluate("""([s, i]) => document.querySelector(`${s}[data-occludable-job-id="${i}"]`)
-                                   .scrollIntoView({block: 'center'})""", [lectura.TARJETA, falta or crudas[-1][0]])
+            self._page.evaluate("""([p, i]) => document.querySelector(`[componentkey="${p}${i}"][role="button"]`)
+                                   ?.scrollIntoView({block: 'center'})""", [lectura.PREFIJO_ID, falta or crudas[-1][0]])
             self._page.wait_for_timeout(random.uniform(700, 1500))
         return list(vistas.values())
