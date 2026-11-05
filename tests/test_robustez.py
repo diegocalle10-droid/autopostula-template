@@ -107,13 +107,12 @@ class InputsInvalidos(unittest.TestCase):
 
 
 class Disyuntor(Base):
-    def test_la_pausa_por_vacios_tiene_su_propia_clave(self):
-        self.cfg.lotes._v["pausa_tras_vacios_horas"] = "7"
-        self.cfg.lotes._v["vacios_seguidos_para_alerta"] = "1"
-        self.tanda(CliFalso([[oferta(1)], []]), 2)
-        pausa = eventos_repo.pausa_activa(self.con, a_iso(self.reloj()))
-        self.assertEqual(pausa["tipo"], "vacios_repetidos")
-        self.assertEqual(de_iso(pausa["pausa_hasta"]) - self.reloj(), timedelta(hours=7))
+    def test_la_parada_por_sospecha_no_caduca_sola(self):
+        with transaccion(self.con):
+            breaker.parar_por_sospecha(self.con, self.reloj(), "x")
+        ok, razon = breaker.puede_ejecutar(self.con, self.cfg, self.reloj() + timedelta(days=3650))
+        self.assertFalse(ok)
+        self.assertIn("hasta reanudar", razon)
 
     def test_la_escalada_sale_de_la_tabla(self):
         self.cfg.escalada_429 = tuple(e if e.ocurrencias != 1 else type(e)(1, 0, "pausa", 9) for e in self.cfg.escalada_429)

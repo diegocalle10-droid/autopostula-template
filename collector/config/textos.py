@@ -37,7 +37,7 @@ CAMPOS: Dict[str, Tuple[str, ...]] = {
     "linkedin_verificacion": ("url",),
     "linkedin_sesion_caducada": (),
     "alerta_captura": ("emoji", "titulo", "cuando", "datos"),
-    "alerta_titulo_parada_total": (), "alerta_titulo_limite": (), "alerta_titulo_detenida": (),
+    "alerta_titulo_parada_total": (), "alerta_titulo_sospecha": (), "alerta_sospecha": (), "alerta_titulo_limite": (), "alerta_titulo_detenida": (),
     "alerta_titulo_subida": (), "alerta_titulo_tanda": (), "alerta_titulo_ctrl_c": (),
     "alerta_titulo_error": ("tipo",),
     "alerta_motivo": ("motivo",), "alerta_pausa": ("hasta",), "alerta_subida": ("subida",), "alerta_reintento": (), "alerta_apagado": ("hora",),

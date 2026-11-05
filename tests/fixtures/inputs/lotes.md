@@ -69,10 +69,9 @@ Acciones: `pausa` (espera `horas`), `hasta_manana` y `parada_total` (espera `hor
 
 | clave | valor | unidad | nota |
 |---|---|---|---|
-| vacios_seguidos_para_alerta | 3 | consultas | En combinaciones que antes devolvían datos |
-| pausa_tras_vacios_horas | 3 | h | |
-| fallos_seguidos_para_parada | 3 | peticiones | Búsquedas o detalles seguidos que fallan sin ser 429 |
-| pausa_tras_fallos_horas | 3 | h | |
+| sospechas_para_control | 3 | combinaciones | Combinaciones seguidas cuya búsqueda falla sin ser 429 (no un vacío que confirma LinkedIn): se pasa a las búsquedas de control |
+| busquedas_de_control | 3 | búsquedas | Combinaciones que hace poco trajeron ofertas y se repiten para comprobar si el sistema funciona. Si alguna trae lista, se sigue; si ninguna, parada sin plazo y aviso por Telegram. La siguiente captura empieza con una búsqueda de control y, si trae lista, levanta la parada sola; si no, `python cli.py reanudar` tras arreglarlo |
+| fallos_seguidos_para_parada | 3 | detalles | Detalles seguidos que fallan sin ser 429: parada sin plazo, como la de las búsquedas de control |
 | fallos_por_oferta_para_descartar | 2 | intentos | Una oferta cuyo detalle llega sin contenido este número de veces se descarta con la regla `detalle_ilegible` de `decisiones.md` y se sigue con la siguiente |
 
 ## Poda

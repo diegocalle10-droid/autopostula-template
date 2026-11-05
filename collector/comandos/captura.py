@@ -8,6 +8,7 @@ from typing import Callable, List, Optional
 
 from collector.db import eventos_repo
 from collector.online import conexion, consultas, mensajes, notificador, subir
+from collector.pipeline import breaker
 from collector.util import apagado, reloj
 
 FINALES_NORMALES = ("tiempo cumplido", "agenda agotada y sin detalles pendientes", "no hay combinaciones pendientes")
@@ -58,14 +59,19 @@ def anomalia(con, r, ahora_iso: str) -> Optional[tuple]:
     if r.motivo is None or r.motivo in FINALES_NORMALES:
         return None
     pausa = eventos_repo.pausa_activa(con, ahora_iso)
+    sospecha = eventos_repo.pausa_activa_con(con, ahora_iso, breaker.MARCA_SOSPECHA)
     if eventos_repo.pausa_activa_con(con, ahora_iso, "[parada_total]"):
         titulo = mensajes.linea("alerta_titulo_parada_total")
+    elif sospecha:
+        titulo = mensajes.linea("alerta_titulo_sospecha")
     elif r.limite:
         titulo = mensajes.linea("alerta_titulo_limite")
     else:
         titulo = mensajes.linea("alerta_titulo_detenida")
     datos = [mensajes.linea("alerta_motivo", motivo=r.motivo)]
-    if pausa:
+    if sospecha:
+        datos.append(mensajes.linea("alerta_sospecha"))
+    elif pausa and pausa["pausa_hasta"] != breaker.SIN_PLAZO:
         datos.append(mensajes.linea("alerta_pausa", hasta=mensajes.hora(reloj.de_iso(pausa["pausa_hasta"]))))
     return titulo, datos
 

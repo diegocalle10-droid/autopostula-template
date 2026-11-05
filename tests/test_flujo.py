@@ -17,7 +17,6 @@ def _pagina(n, desde=1):
 class Flujo(Base):
     def setUp(self):
         super().setUp()
-        self.cfg.lotes._v["vacios_seguidos_para_alerta"] = "1000"   # el CLI falso devuelve vacío tras el guion
         self.r = RelojSimulado()
 
     def _flujo(self, cli, n=0, horas=3):

@@ -21,8 +21,8 @@ CLAVES_LOTES = (
     "max_paginas", "umbral_pagina_nuevas", "umbral_pagina_perfil", "margen_jobage_dias", "reintento_fallida_horas", "fallos_por_combinacion_para_saltar", "detail_por_lote", "detalles_pendientes_max",
     "pausa_entre_detail_min", "pausa_entre_detail_max", "pausa_entre_lotes_detail_min",
     "pausa_entre_lotes_detail_max", "horas_por_defecto", "bloqueo_caduca_horas", "apagar_tras_captura_min",
-    "vacios_seguidos_para_alerta", "pausa_tras_vacios_horas", "fallos_seguidos_para_parada", "fallos_por_oferta_para_descartar",
-    "pausa_tras_fallos_horas", "ubicacion_sin_resultados_terminos", "ubicacion_sin_resultados_prioridad_max",
+    "sospechas_para_control", "busquedas_de_control", "fallos_seguidos_para_parada", "fallos_por_oferta_para_descartar",
+    "ubicacion_sin_resultados_terminos", "ubicacion_sin_resultados_prioridad_max",
     "pasadas_sin_nuevas_para_duplicar", "factor_cadencia_poda", "cadencia_maxima_dias", "huella_dias",
 )
 ACCIONES_429 = ("pausa", "hasta_manana", "parada_total")

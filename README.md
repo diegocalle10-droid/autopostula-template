@@ -75,7 +75,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 | `sesion` | Inicia o comprueba la sesión de LinkedIn |
 | `geoids [frases] [--escribir]` | Busca en LinkedIn el `geo_id` de los lugares de `ubicaciones.md` y guarda los fiables |
 | `run-continuo [--horas H]` | La captura (lo que lanza `iniciar.bat`) |
-| `status`, `reanudar [--forzar]` | Estado del día y del disyuntor; levantar sus pausas |
+| `status`, `reanudar [--forzar]` | Estado del día y del disyuntor; levantar sus pausas y paradas |
 | `init-db`, `plan`, `run`, `detail`, `prune`, `reevaluar` | Piezas sueltas de la captura (`--dry-run` solo muestra qué haría) |
 | `online-init`, `online-subir`, `online-estado`, `online-pdf` | Neon: esquema, subida, comparación, validación y PDF de los CV |
 
@@ -128,6 +128,6 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 
 ### Riesgos y límites
 
-- La lectura depende del texto y de unos pocos selectores de la página (`li[data-occludable-job-id]`, el botón «Página N»), en español o en inglés; si LinkedIn cambia el marcado puede dejar de devolver resultados (`vacios_seguidos_para_alerta` búsquedas vacías seguidas activan una pausa).
+- La lectura depende del texto y de unos pocos selectores de la página (tarjetas con `componentkey`, el botón «Página N», el aviso de «resultados relacionados»), en español o en inglés; si LinkedIn cambia el marcado, las búsquedas fallan: tras `sospechas_para_control` combinaciones fallidas y `busquedas_de_control` controles sin lista, la captura se para sin plazo y avisa por Telegram.
 - La sesión caduca: una vez por día de ejecución se comprueba y, si falló, hay aviso por Telegram y unos minutos para iniciarla en la ventana; si nadie lo hace, esa noche no hay captura.
 - Ofertas y CV personales están en un servicio externo (Neon). El plan gratuito guarda poco historial y el sistema no hace copias de seguridad.

@@ -45,3 +45,15 @@ def cancelar_pausas(con: sqlite3.Connection, ahora: str) -> int:
     """Levanta a mano las pausas vigentes (comando `reanudar`). Devuelve cuántas había."""
     cur = con.execute("UPDATE eventos SET pausa_hasta = ? WHERE pausa_hasta > ?", (ahora, ahora))
     return cur.rowcount
+
+
+def cancelar_pausa_con(con: sqlite3.Connection, ahora: str, marca: str) -> int:
+    """Levanta las pausas vigentes cuyo contexto contiene `marca`."""
+    cur = con.execute("UPDATE eventos SET pausa_hasta = ? WHERE pausa_hasta > ? AND contexto LIKE ?", (ahora, ahora, f"%{marca}%"))
+    return cur.rowcount
+
+
+def otra_pausa_activa(con: sqlite3.Connection, ahora: str, marca: str) -> Optional[sqlite3.Row]:
+    """Una pausa vigente cuyo contexto no contiene `marca` (p. ej. un 429 junto a una parada por sospecha), o None."""
+    return con.execute("SELECT * FROM eventos WHERE pausa_hasta > ? AND COALESCE(contexto, '') NOT LIKE ? LIMIT 1",
+                       (ahora, f"%{marca}%")).fetchone()

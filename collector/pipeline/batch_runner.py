@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 from typing import Callable, Optional
 
 from collector.config.modelos import Config, Ubicacion
-from collector.db import combinaciones_repo, consultas_repo
+from collector.db import combinaciones_repo, consultas_repo, eventos_repo
 from collector.db.connection import transaccion
 from collector.linkedin import lectura
 from collector.linkedin.errores import LimiteError, LinkedinError
 from collector.filters.titulo import FiltroTitulos
-from collector.pipeline import breaker
+from collector.pipeline import breaker, control
 from collector.pipeline.ingest import ingerir
 from collector.pipeline.ritmo import Ritmo
 from collector.util.reloj import a_iso, de_iso
@@ -108,16 +108,58 @@ def _cerrar(con: sqlite3.Connection, cfg: Config, combo: sqlite3.Row, ahora: dat
             combinaciones_repo.reprogramar(con, combo["combinacion_id"], a_iso(ahora + timedelta(hours=horas)))
 
 
+def _pedidor(con: sqlite3.Connection, cfg: Config, cli, ritmo: Ritmo, reloj: Callable[[], datetime]) -> control.Pedir:
+    """La página 1 de una combinación para las búsquedas de control: con todo el periodo, registrada como cualquier otra."""
+    def pedir(combo: sqlite3.Row) -> int:
+        ubic, jobage, ahora = cfg.ubicacion_por_frase(combo["ubicacion_frase"]), cfg.lotes.entero("jobage_dias_primer_barrido"), reloj()
+        try:
+            return _una_pagina(con, cfg, cli, ritmo, combo, ubic, 1, jobage, ahora)[0]
+        except LimiteError as e:
+            _registrar_error(con, combo, 1, jobage, ahora, e, True)
+            raise
+        except LinkedinError as e:
+            _registrar_error(con, combo, 1, jobage, ahora, e, False)
+            raise
+    return pedir
+
+
+def _con_control(con: sqlite3.Connection, cfg: Config, res: ResultadoTanda, paso, ahora: datetime) -> bool:
+    """Ejecuta un paso de control y anota sus peticiones. True si la tanda debe parar."""
+    try:
+        motivo, n = paso()
+    except LimiteError:
+        res.limite = True
+        res.detenida_por = breaker.parar_por_limite(con, cfg, ahora, "búsqueda de control")
+        return True
+    res.consultas += n
+    if motivo:
+        res.detenida_por = motivo
+    return motivo is not None
+
+
+def _arrancar(con: sqlite3.Connection, cfg: Config, res: ResultadoTanda, pedir: control.Pedir,
+              reloj: Callable[[], datetime]) -> bool:
+    """Con una parada por sospecha (y nada más que lo impida), primero la búsqueda de control. True si se puede buscar."""
+    ahora = reloj()
+    if (breaker.hay_parada_por_sospecha(con, ahora) and breaker.en_horario_permitido(cfg, ahora)
+            and not eventos_repo.otra_pausa_activa(con, a_iso(ahora), breaker.MARCA_SOSPECHA)):
+        if _con_control(con, cfg, res, lambda: control.comprobar_al_arrancar(con, cfg, pedir, ahora), ahora):
+            return False
+    ok, razon = breaker.puede_ejecutar(con, cfg, reloj())
+    if not ok:
+        res.detenida_por = razon
+    return ok
+
+
 def ejecutar_tanda(con: sqlite3.Connection, cfg: Config, cli, ritmo: Ritmo,
                    reloj: Callable[[], datetime], max_consultas: int, una_combinacion: bool = False) -> ResultadoTanda:
     """Búsquedas hasta `max_consultas` peticiones; con `una_combinacion`, para tras la primera combinación."""
     res = ResultadoTanda()
-    ok, razon = breaker.puede_ejecutar(con, cfg, reloj())
-    if not ok:
-        res.detenida_por = razon
+    pedir = _pedidor(con, cfg, cli, ritmo, reloj)
+    if not _arrancar(con, cfg, res, pedir, reloj):
         return res
-    restante = max_consultas
-    while restante > 0:
+    while max_consultas - res.consultas > 0:   # las búsquedas de control también cuentan
+        restante = max_consultas - res.consultas
         debidas = combinaciones_repo.debidas(con, a_iso(reloj()), 1)
         if not debidas:
             res.detenida_por = "no hay combinaciones pendientes"
@@ -138,12 +180,6 @@ def ejecutar_tanda(con: sqlite3.Connection, cfg: Config, cli, ritmo: Ritmo,
         _cerrar(con, cfg, combo, ahora, nuevas, completa)
         res.consultas, res.nuevas = res.consultas + usadas, res.nuevas + nuevas
         res.combinaciones += 1 if completa else 0
-        restante -= usadas
-        with transaccion(con):
-            parar = breaker.revisar_vacios(con, cfg, ahora) or breaker.revisar_fallos(con, cfg, ahora)
-        if parar:
-            res.detenida_por = "alerta del disyuntor (vacíos o fallos seguidos)"
-            break
-        if una_combinacion:
+        if _con_control(con, cfg, res, lambda: control.revisar(con, cfg, pedir, ahora), ahora) or una_combinacion:
             break
     return res
