@@ -174,6 +174,16 @@ class Disyuntor(Base):
         self.assertIsNone(c["ultima_ejecucion"])
         self.assertEqual(de_iso(c["proxima_ejecucion"]) - self.reloj(), timedelta(hours=1))
 
+    def test_lista_sin_tarjetas_dos_veces_salta_a_la_siguiente_sin_pausar(self):
+        sin = LinkedinError("LISTA_SIN_TARJETAS", "la página no trae lista")
+        cli = CliFalso([sin, sin, [oferta(1)], [oferta(2)]])
+        r = self.tanda(cli, 4)
+        self.assertEqual(r.consultas, 4)
+        self.assertNotIn("disyuntor", r.detenida_por or "")
+        self.assertIsNone(eventos_repo.pausa_activa(self.con, a_iso(self.reloj())))
+        self.assertIsNone(obtener_combinacion(self.con, 1)["ultima_ejecucion"])
+        self.assertIsNotNone(obtener_combinacion(self.con, 2)["ultima_ejecucion"])
+
     def test_vacios_seguidos_activan_la_alerta(self):
         self.tanda(CliFalso([[oferta(1)]]), 1)                       # hubo datos alguna vez
         r = self.tanda(CliFalso([[], [], []]), 3)

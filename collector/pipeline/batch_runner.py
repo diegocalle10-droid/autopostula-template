@@ -71,20 +71,31 @@ def _procesar(con, cfg: Config, cli, ritmo: Ritmo, combo: sqlite3.Row, ubic: Ubi
     jobage = jobage_para(combo, cfg, ahora)
     usadas = nuevas = 0
     for pagina in range(1, cfg.lotes.entero("max_paginas") + 1):
-        if usadas >= restante:
-            return usadas, nuevas, False
-        try:
-            n_res, n_nuevos, n_perfil = _una_pagina(con, cfg, cli, ritmo, combo, ubic, pagina, jobage, ahora)
-        except LimiteError as e:
-            _registrar_error(con, combo, pagina, jobage, ahora, e, True)
-            raise
-        except LinkedinError as e:
-            _registrar_error(con, combo, pagina, jobage, ahora, e, False)
-            return usadas + 1, nuevas, False
+        fallos = 0
+        while True:
+            if usadas >= restante:
+                return usadas, nuevas, False
+            try:
+                n_res, n_nuevos, n_perfil = _una_pagina(con, cfg, cli, ritmo, combo, ubic, pagina, jobage, ahora)
+                break
+            except LimiteError as e:
+                _registrar_error(con, combo, pagina, jobage, ahora, e, True)
+                raise
+            except LinkedinError as e:
+                _registrar_error(con, combo, pagina, jobage, ahora, e, False)
+                usadas, fallos = usadas + 1, fallos + 1
+                if not _reintentable(cfg, e, pagina, fallos):
+                    return usadas, nuevas, False
         usadas, nuevas = usadas + 1, nuevas + n_nuevos
         if not _hay_otra_pagina(n_res, n_nuevos, n_perfil, cfg):
             break
     return usadas, nuevas, True
+
+
+def _reintentable(cfg: Config, e: LinkedinError, pagina: int, fallos: int) -> bool:
+    """Una lista sin tarjetas en la primera página se pide otra vez hasta `fallos_por_combinacion_para_saltar`; después se salta."""
+    return (e.codigo == breaker.LISTA_SIN_TARJETAS and pagina == 1
+            and fallos < cfg.lotes.entero("fallos_por_combinacion_para_saltar"))
 
 
 def _cerrar(con: sqlite3.Connection, cfg: Config, combo: sqlite3.Row, ahora: datetime, nuevas: int, completa: bool) -> None:

@@ -11,6 +11,9 @@ from collector.db.connection import transaccion
 from collector.util.reloj import a_iso, inicio_dia_local, inicio_dia_siguiente_local
 
 
+LISTA_SIN_TARJETAS = "LISTA_SIN_TARJETAS"   # fallo de la página de esa combinación: se salta, no pausa la ejecución
+
+
 def puede_ejecutar(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> Tuple[bool, str]:
     pausa = eventos_repo.pausa_activa(con, a_iso(ahora))
     if pausa:
@@ -54,10 +57,10 @@ def revisar_vacios(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> boo
 
 
 def revisar_fallos(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> bool:
-    """N consultas seguidas fallidas (sin ser 429): pausa."""
+    """N consultas seguidas fallidas (sin ser 429 ni lista sin tarjetas, que solo salta la combinación): pausa."""
     n = cfg.lotes.entero("fallos_seguidos_para_parada")
     ultimas = consultas_repo.ultimas(con, n)
-    if len(ultimas) < n or any(u["resultado"] != "fallida" for u in ultimas):
+    if len(ultimas) < n or any(u["resultado"] != "fallida" or u["codigo_error"] == LISTA_SIN_TARJETAS for u in ultimas):
         return False
     parar_por_fallos(con, cfg, ahora, f"{n} fallos seguidos")
     return True
