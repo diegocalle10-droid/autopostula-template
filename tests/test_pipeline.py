@@ -79,7 +79,7 @@ class Tanda(Base):
         self.assertEqual(len(con_conocidas.llamadas), 1)
 
     def test_region_descarta_pais_no_hispano(self):
-        reg = self.cfg.ubicaciones[-1]            # una región (Latin America / South America)
+        reg = self.cfg.ubicaciones[-1]            # una región (Latin America)
         self.assertEqual(reg.tipo, "region")
         self.con.execute("UPDATE combinaciones SET proxima_ejecucion = '2999-01-01T00:00:00Z'")
         self.con.execute("UPDATE combinaciones SET proxima_ejecucion = '2000-01-01T00:00:00Z' WHERE ubicacion_frase = ?", (reg.frase,))

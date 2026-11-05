@@ -14,6 +14,7 @@ class Ubicacion:
     tipo: str                      # pais | region | ciudad (informativo)
     frase: str
     pais_esperado: Optional[str]   # None en una región de varios países
+    geo_id: Optional[str] = None   # identificador de LinkedIn; sin él la lista aplica la ubicación de la cuenta
 
 
 @dataclass(frozen=True)

@@ -92,6 +92,7 @@ def doctor(args) -> int:
         ok = bool(conexion.cargar_variable(Path(args.raiz), variable))
         print(("OK   " if ok else "FALLA ") + f"{variable} en .env" + ("" if ok else " (ver INSTALAR.md y la carpeta guia/)"))
         fallos += 0 if ok else 1
+    fallos += _geo_ids(args)
     pendientes = pendientes_de_configurar()
     if pendientes:
         print(f"AVISO inputs/mensajes/enlaces.md sin rellenar: {', '.join(pendientes)}")
@@ -100,6 +101,19 @@ def doctor(args) -> int:
     except ConfigError:
         pass   # ya lo ha dicho la comprobación de inputs/
     return 1 if fallos else 0
+
+
+def _geo_ids(args) -> int:
+    """Cada lugar necesita su geo_id: sin él LinkedIn aplica la ubicación de la cuenta y la captura no arranca."""
+    try:
+        faltan = [u.frase for u in cargar_config(args.inputs).ubicaciones if not u.geo_id]
+    except ConfigError:
+        return 0   # ya lo ha dicho la comprobación de inputs/
+    if faltan:
+        print(f"FALLA geo_id sin resolver en ubicaciones.md: {', '.join(faltan)} (python cli.py geoids --escribir, ver INSTALAR.md)")
+    else:
+        print("OK   geo_id de todos los lugares de ubicaciones.md")
+    return 1 if faltan else 0
 
 
 def probar_titulos(args) -> int:

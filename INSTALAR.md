@@ -51,6 +51,10 @@ Comprueba cada uno; si falta, ofrécete a instalarlo con `winget` y, tras instal
 
 1. `python cli.py instalar`. Debe terminar sin fallos salvo los avisos de la sesión de LinkedIn y de los enlaces aún pendientes.
 2. `python cli.py sesion`: se abre Chrome. El usuario inicia sesión en LinkedIn con email y contraseña (recomendado: una cuenta secundaria, con la interfaz en español o inglés). Si LinkedIn pide un código, lo introduce en la misma ventana.
+3. **`python cli.py geoids --escribir`**: busca en LinkedIn el `geo_id` de cada lugar de `inputs/ubicaciones.md` que aún tiene `-` (LinkedIn ignora el texto de la ubicación; sin `geo_id` buscaría en la ubicación de la cuenta). Hace una búsqueda por lugar, al ritmo normal (más de un minuto entre lugares): avisa al usuario de que tarda.
+   - `OK`: el desplegable de LinkedIn muestra ese lugar; se guarda solo. Repasa con el usuario la línea «ubicación de las tarjetas»: deben ser de ese lugar.
+   - `REVISAR`: LinkedIn entendió otra cosa (otro sitio, «(80 km)», o ninguna sugerencia) y no se guarda. Prueba con otro nombre (en inglés, o el país en vez de la región) con `python cli.py geoids "<frase nueva>" --escribir` tras cambiar la `frase` en la tabla, o quita ese lugar si LinkedIn no lo ofrece.
+   - Si más adelante el usuario cambia sus lugares, este paso se repite: `geoids --escribir` solo busca los que tienen `-`.
 
 ## 6. Que el PC no se duerma
 
@@ -80,7 +84,7 @@ Si lo quiere: `skills-project-bot/LEEME.md` y guía `guia/bot.md`.
 
 Solo cuando todo lo anterior está hecho. Si algo falla, vuelve al paso que corresponda.
 
-1. `python cli.py doctor`: todo `OK` (el único `PENDIENTE` que se admite es `url_rutina`).
+1. `python cli.py doctor`: todo `OK`, incluido el `geo_id` de todos los lugares (el único `PENDIENTE` que se admite es `url_rutina`).
 2. `python cli.py online-estado`: conecta con Neon.
 3. La Action: `gh workflow run cv-pdf.yml -f fuente=manual` y `gh run watch`. Debe terminar en verde (sin `gh`: Actions → «CV a PDF» → Run workflow).
 4. La rutina: que la lance a mano una vez desde Programadas (botón de ejecutar ahora). Debe terminar diciendo el código de la Action (`204`), y en `gh run list` aparece una ejecución nueva de «CV a PDF».

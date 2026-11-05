@@ -49,6 +49,18 @@ class Tarjetas(unittest.TestCase):
         t = lectura.tarjeta("1", "A\nA\nAcme\nGuadalajara (Jalisco)", ETIQUETAS, AHORA)
         self.assertEqual((t["location"], t["modalidad"]), ("Guadalajara (Jalisco)", None))
 
+    def test_lista_nueva_tarjeta_abierta_y_verificada(self):
+        texto = ("Seleccionado, Lead Product Data Analyst (empleo verificado)\nLead Product Data Analyst \n\nLawnStarter\n\n"
+                 "México (En remoto)\n\n75K USD/yr - 100K USD/yr\n\nPublicado hace 3 días\nhace 3 días\n\n · \n\nSolicitud sencilla")
+        t = lectura.tarjeta("4484358545", texto, ETIQUETAS, AHORA)
+        self.assertEqual((t["title"], t["company"], t["location"], t["modalidad"], t["date"]),
+                         ("Lead Product Data Analyst", "LawnStarter", "México", "remoto", "2026-10-28"))
+
+    def test_lista_nueva_titulo_sin_repetir(self):
+        texto = "Analista BI Senior \n\nBETWEEN Group\n\nMadrid (En remoto)\n\nEvaluando solicitudes de forma activa\n\nPromocionado"
+        t = lectura.tarjeta("4484541298", texto, ETIQUETAS, AHORA)
+        self.assertEqual((t["title"], t["company"], t["location"]), ("Analista BI Senior", "BETWEEN Group", "Madrid"))
+
     def test_tarjeta_sin_pintar(self):
         self.assertIsNone(lectura.tarjeta("1", "  \n ", ETIQUETAS, AHORA))
 
@@ -63,6 +75,8 @@ class Tarjetas(unittest.TestCase):
         u = lectura.url_busqueda("analista de datos", "Mexico", "2", 30)
         for trozo in ("f_WT=2", "f_TPR=r2592000", "f_AL=true", "keywords=analista+de+datos"):
             self.assertIn(trozo, u)
+        self.assertNotIn("geoId", u)
+        self.assertIn("geoId=103323778", lectura.url_busqueda("analista de datos", "Mexico", "2", 30, "103323778"))
 
 
 class Cabecera(unittest.TestCase):

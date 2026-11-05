@@ -73,6 +73,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 |---|---|
 | `instalar`, `doctor`, `validar-cv`, `probar-titulos`, `telegram-chat-id` | Puesta en marcha y comprobaciones |
 | `sesion` | Inicia o comprueba la sesión de LinkedIn |
+| `geoids [frases] [--escribir]` | Busca en LinkedIn el `geo_id` de los lugares de `ubicaciones.md` y guarda los fiables |
 | `run-continuo [--horas H]` | La captura (lo que lanza `iniciar.bat`) |
 | `status`, `reanudar [--forzar]` | Estado del día y del disyuntor; levantar sus pausas |
 | `init-db`, `plan`, `run`, `detail`, `prune`, `reevaluar` | Piezas sueltas de la captura (`--dry-run` solo muestra qué haría) |
@@ -83,7 +84,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 | Archivo | Qué decide |
 |---|---|
 | `puestos.md` | Términos de búsqueda y su prioridad |
-| `ubicaciones.md` | Lugares donde buscar (países, regiones, ciudades); países aceptados y excluidos |
+| `ubicaciones.md` | Lugares donde buscar (países, regiones, ciudades) con su `geo_id` de LinkedIn; países aceptados y excluidos |
 | `modalidades.md` | Modalidades aceptadas (remoto, híbrido, presencial) |
 | `prefiltro.md` | Familias de palabras del título: a qué ofertas se les pide el detalle |
 | `decisiones.md` | Estado y motivo de cada caso |
