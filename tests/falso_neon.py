@@ -26,3 +26,15 @@ class FalsoNeon:
 
     def close(self):
         self.cerrada = True
+
+
+def esquema_neon_sqlite() -> str:
+    """001_neon.sql con lo que 005_cv_keywords.sql añade a `emparejamientos`, en SQLite (que no admite DROP CONSTRAINT)."""
+    from collector.online.esquema import CARPETA
+    sql = (CARPETA / "001_neon.sql").read_text(encoding="utf-8")
+    for viejo, nuevo in (("emparejado_en TEXT NOT NULL, validado_en TEXT, notificado_en TEXT,",
+                          "emparejado_en TEXT NOT NULL, validado_en TEXT, notificado_en TEXT, keywords TEXT, contenido TEXT,"),
+                         ("AND cv_md IS NOT NULL))", "AND (cv_md IS NOT NULL OR contenido IS NOT NULL)))")):
+        assert viejo in sql, viejo
+        sql = sql.replace(viejo, nuevo)
+    return sql

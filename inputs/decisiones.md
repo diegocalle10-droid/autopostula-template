@@ -21,7 +21,7 @@ Acciones: `descartar` (queda descartada con el motivo), `esperar` (no se pide su
 | situacion | se da cuando |
 |---|---|
 | pais_excluido | El país de la oferta está en «Países excluidos» de `ubicaciones.md` |
-| duplicada | Otra oferta tiene la misma huella (empresa, título y ubicación) dentro de `huella_dias` |
+| duplicada | Otra oferta tiene la misma huella (empresa, título y ubicación) dentro de `huella_dias`. También, al leer el detalle, otra oferta de la misma empresa con la misma descripción en esa ventana: la misma vacante publicada en otra ubicación |
 | pais_desconocido | La ubicación no se reconoce como país aceptado ni excluido |
 
 ## Reglas de decisión

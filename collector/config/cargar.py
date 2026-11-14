@@ -252,11 +252,14 @@ def _cv(carpeta: Path) -> ConfigCv:
     cvs = tuple(CvBase(f["id"], f["archivo"], f["perfil"]) for f in _tabla(t, "cv_base", "cv.md", ("id", "archivo", "perfil")))
     if len({c.id for c in cvs}) != len(cvs):
         raise ConfigError("cv.md: hay ids de CV repetidos")
-    r = _reglas(t, "cv.md", ("umbral_afinidad", "tope_rutina"))
-    umbral = _entero(r["umbral_afinidad"], "cv.md: umbral_afinidad")
-    if not 0 <= umbral <= 100:
-        raise ConfigError("cv.md: umbral_afinidad debe estar entre 0 y 100")
-    return ConfigCv(cvs, umbral, _entero(r["tope_rutina"], "cv.md: tope_rutina"))
+    r = _reglas(t, "cv.md", ("umbral_afinidad", "tope_rutina", "keywords_min", "keywords_max", "cobertura_minima"))
+    v = {k: _entero(r[k], f"cv.md: {k}") for k in ("umbral_afinidad", "keywords_min", "keywords_max", "cobertura_minima")}
+    if not (0 <= v["umbral_afinidad"] <= 100 and 0 <= v["cobertura_minima"] <= 100):
+        raise ConfigError("cv.md: umbral_afinidad y cobertura_minima deben estar entre 0 y 100")
+    if not 1 <= v["keywords_min"] <= v["keywords_max"]:
+        raise ConfigError("cv.md: hace falta 1 <= keywords_min <= keywords_max")
+    return ConfigCv(cvs, v["umbral_afinidad"], _entero(r["tope_rutina"], "cv.md: tope_rutina"), v["keywords_min"],
+                    v["keywords_max"], v["cobertura_minima"])
 
 
 def cargar_cv(carpeta) -> ConfigCv:

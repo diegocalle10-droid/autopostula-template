@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import sqlite3
-from typing import Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional
 
 from collector.estados import DESCARTADA, PENDIENTE
+from collector.util.texto import normalizar
 
 
 def existe(con: sqlite3.Connection, job_id: str) -> bool:
@@ -87,3 +88,40 @@ def actualizar_evaluacion(con: sqlite3.Connection, job_id: str, d: dict) -> None
 
 def contar_por_estado(con: sqlite3.Connection) -> dict:
     return {f["estado"]: f["n"] for f in con.execute("SELECT estado, COUNT(*) AS n FROM ofertas GROUP BY estado")}
+
+
+def buscar_original_por_contenido(con: sqlite3.Connection, empresa: Optional[str], descripcion: str, job_id: str,
+                                  desde: str) -> Optional[str]:
+    """La misma vacante publicada en otra ubicación: otra oferta de la misma empresa con la misma descripción (sin
+    contar mayúsculas, acentos ni espacios), vista desde `desde`, que no sea un duplicado. La más antigua."""
+    if not empresa or not (descripcion or "").strip():
+        return None
+    objetivo = normalizar(descripcion)
+    filas = con.execute(
+        """SELECT job_id, descripcion FROM ofertas
+           WHERE empresa = ? AND job_id <> ? AND duplicada_de IS NULL AND descripcion IS NOT NULL AND fecha_hallazgo >= ?
+           ORDER BY fecha_hallazgo, job_id""", (empresa, job_id, desde))
+    return next((f["job_id"] for f in filas if normalizar(f["descripcion"]) == objetivo), None)
+
+
+def marcar_duplicada(con: sqlite3.Connection, job_id: str, original: str) -> None:
+    con.execute("UPDATE ofertas SET duplicada_de = ? WHERE job_id = ?", (original, job_id))
+
+
+def grupos_por_contenido(con: sqlite3.Connection) -> List[List[sqlite3.Row]]:
+    """Grupos de ofertas con la misma empresa y la misma descripción, la más antigua primero (la que se conserva)."""
+    grupos: Dict[tuple, List[sqlite3.Row]] = {}
+    for f in con.execute("""SELECT job_id, empresa, titulo, ubicacion, estado, descripcion FROM ofertas
+                            WHERE descripcion IS NOT NULL AND empresa IS NOT NULL AND duplicada_de IS NULL
+                            ORDER BY fecha_hallazgo, job_id"""):
+        grupos.setdefault((f["empresa"], normalizar(f["descripcion"])), []).append(f)
+    return [g for g in grupos.values() if len(g) > 1]
+
+
+def borrar_copias(con: sqlite3.Connection, original: str, copias: List[str]) -> None:
+    """Borra las copias con sus keywords y hallazgos; lo que apuntaba a ellas pasa a apuntar a la original.
+    Los disparadores de la cola llevan el borrado a Neon (allí cae también su CV a medida, en cascada)."""
+    huecos = ", ".join("?" * len(copias))
+    con.execute(f"UPDATE ofertas SET duplicada_de = ? WHERE duplicada_de IN ({huecos})", (original, *copias))
+    for tabla in ("oferta_keywords", "hallazgos", "ofertas"):
+        con.execute(f"DELETE FROM {tabla} WHERE job_id IN ({huecos})", copias)

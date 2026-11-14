@@ -95,8 +95,9 @@ def _consulta(sql: str) -> Html:
 def cv_listo(o: Fila) -> str:
     """Pie del PDF (Telegram admite 1.024 caracteres visibles)."""
     lugar = " · ".join(_e(v, 60) for v in (o.get("ubicacion"), o.get("modalidad")) if v)
-    return texto("cv_listo", cabecera=_cabecera(o), job_id=o["job_id"], lugar=Html(lugar + " · " if lugar else ""),
-                 cv_id=o.get("cv_id"), afinidad=o.get("afinidad"), url=_e(o.get("url"), 300))
+    campos = dict(cabecera=_cabecera(o), job_id=o["job_id"], lugar=Html(lugar + " · " if lugar else ""),
+                  cv_id=o.get("cv_id"), afinidad=o.get("afinidad"), url=_e(o.get("url"), 300))
+    return texto("cv_listo", **campos)
 
 
 def sin_cv(o: Fila) -> str:

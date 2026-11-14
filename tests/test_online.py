@@ -4,7 +4,7 @@ from collector.comandos import captura
 from collector.db import ofertas_repo
 from collector.online import subir
 from tests.ayudas import base_en_memoria
-from tests.falso_neon import FalsoNeon
+from tests.falso_neon import FalsoNeon, esquema_neon_sqlite
 from tests.test_db import fila
 
 AHORA = "2026-10-28T12:00:00Z"
@@ -102,7 +102,7 @@ class Pdfs(unittest.TestCase):
         from tests.ayudas import RAIZ, config
         self.cfg, self.raiz, self.tmp = config(), RAIZ, Path(tempfile.mkdtemp())
         self.remoto = sqlite3.connect(":memory:")
-        self.remoto.executescript((esquema.CARPETA / "001_neon.sql").read_text(encoding="utf-8"))
+        self.remoto.executescript(esquema_neon_sqlite())
         self.remoto.executescript(AVISOS_SQLITE)
         self.addCleanup(self.remoto.close)
         self.remoto.execute("INSERT INTO ofertas (job_id,url,titulo,empresa,fecha_hallazgo,ultima_vista,modalidad,estado) "
