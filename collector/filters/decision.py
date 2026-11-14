@@ -14,7 +14,8 @@ from collector.estados import CONDICIONES
 @dataclass
 class Contexto:
     activa: bool
-    modalidad_fuera: Optional[str]      # modalidad de la oferta si LinkedIn la rotula y no es la aceptada
+    modalidad_fuera: Optional[str]      # modalidad de la oferta (etiqueta o, sin ella, descripción) si no es la aceptada
+    modalidad_sin_confirmar: bool       # sin etiqueta de LinkedIn y sin señal de modalidad en la descripción
     nivel: str                          # ninguno | aceptable | exigente | dudoso
     idioma_titulo: Optional[str]
     idioma_contenido: Optional[str]
@@ -26,6 +27,7 @@ EVALUADORES: Dict[str, Callable[[Contexto], bool]] = {
     "cerrada": lambda c: not c.activa,
     "detalle_ilegible": lambda c: False,   # se aplica antes de evaluar, en pipeline/detail_runner.py
     "modalidad_no_aceptada": lambda c: bool(c.modalidad_fuera),
+    "modalidad_sin_confirmar": lambda c: c.modalidad_sin_confirmar,
     "nivel_exigente": lambda c: c.nivel == "exigente",
     "nivel_dudoso": lambda c: c.nivel == "dudoso",
     "contenido_vigilado_titulo_no": lambda c: c.idioma_contenido == c.vigilado and c.idioma_titulo != c.vigilado,

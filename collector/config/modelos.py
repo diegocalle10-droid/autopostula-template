@@ -29,6 +29,7 @@ class Modalidad:
     filtro: str                      # valor del filtro de modalidad de LinkedIn (f_WT)
     aceptada: bool
     etiquetas: Tuple[str, ...]       # cómo la rotula LinkedIn en la tarjeta y en la oferta (normalizadas)
+    senales: Tuple[str, ...] = ()    # frases de la descripción que delatan la modalidad cuando LinkedIn no pone etiqueta
 
 
 @dataclass(frozen=True)

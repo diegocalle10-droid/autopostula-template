@@ -33,7 +33,7 @@ La afinidad mide cuánto de lo que pide la oferta ya está respaldado por un CV 
 
 Parte del CV elegido y mantén su estructura de Markdown (`#` nombre, `##` secciones, `###` cargos, listas con `-`). Los títulos de sección (`##`) se copian tal cual, sin traducirlos ni renombrarlos: la validación los usa para proteger los datos fijos.
 
-**Se copian literalmente del CV base:** el nombre, la línea de contacto, la línea de empresa y fechas de cada puesto, la formación, las certificaciones y los idiomas con su nivel.
+**Se copian literalmente del CV base:** el nombre, la línea de contacto, la línea de empresa y fechas de cada puesto (carácter a carácter, con el mismo formato y separadores del CV base; no la reescribas ni la unifiques con otra), la formación, las certificaciones y los idiomas con su nivel.
 
 **Haz esto:**
 - Adapta el título de cada cargo (`###`) para que sea coherente con el puesto que pide la oferta y con las funciones que describes en él.

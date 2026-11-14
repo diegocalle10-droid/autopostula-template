@@ -113,8 +113,9 @@ def _terminos(carpeta: Path) -> List[Termino]:
 def _modalidad(carpeta: Path) -> ConfigModalidad:
     t = _archivo(carpeta, "modalidades.md")
     mods = tuple(Modalidad(f["nombre"], f["filtro"], f["aceptada"] == "si",
-                           tuple(normalizar(e) for e in f["etiquetas"].split(",") if e.strip()))
-                 for f in _tabla(t, "modalidades", "modalidades.md", ("nombre", "filtro", "aceptada", "etiquetas")))
+                           tuple(normalizar(e) for e in f["etiquetas"].split(",") if e.strip()),
+                           tuple(normalizar(e) for e in f["senales"].split(",") if e.strip()))
+                 for f in _tabla(t, "modalidades", "modalidades.md", ("nombre", "filtro", "aceptada", "etiquetas", "senales")))
     if not any(m.aceptada for m in mods):
         raise ConfigError("modalidades.md: ninguna modalidad está marcada como aceptada")
     if any(not m.etiquetas for m in mods):

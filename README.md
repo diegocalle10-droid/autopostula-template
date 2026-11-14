@@ -122,7 +122,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 - **Sin tope diario**: lo limitan las horas de la captura al ritmo de `lotes.md`. Un 429, captcha o verificación nunca se reintenta de inmediato: lo gobierna el disyuntor (escalada en `lotes.md`).
 - **Prefiltro por título** antes de pedir el detalle (la petición escasa) y **paginación por relevancia**: la página siguiente solo si trae suficientes ofertas nuevas y suficientes títulos del perfil.
 - **Las ofertas descartadas se guardan** con su motivo: nunca se repite su detalle. Las descripciones no se purgan: permiten recalibrar las reglas sin volver a pedirlas a LinkedIn.
-- **La modalidad es la etiqueta de LinkedIn**; sin etiqueta vale la primera modalidad aceptada.
+- **La modalidad es la etiqueta de LinkedIn**; sin etiqueta se lee la descripción con las frases de `modalidades.md` (`senales`, en español e inglés): si delata otra modalidad o no delata ninguna, la oferta se descarta (`modalidad:sin_confirmar`) y no gasta redacción de CV.
 - **CV a medida**: emparejamiento laxo (`umbral_afinidad`) porque una persona revisa cada CV; los CV base no se mezclan. El CV vive como Markdown en Neon (`emparejamientos.cv_md`) y el PDF lo genera la Action con ReportLab, sin IA.
 - **SQL solo en `db/` y `online/`**, siempre parametrizado; `inputs/` se valida al arrancar.
 

@@ -11,8 +11,8 @@ Reglas:
 
 ## Modalidades
 
-| nombre | filtro | aceptada | etiquetas |
-|---|---|---|---|
-| remoto | 2 | si | en remoto, remoto, remote |
-| hibrido | 3 | no | híbrido, hibrido, hybrid |
-| presencial | 1 | no | presencial, on-site, onsite |
+| nombre | filtro | aceptada | etiquetas | senales |
+|---|---|---|---|---|
+| remoto | 2 | si | en remoto, remoto, remote | 100% remoto, 100 % remoto, 100% remote, totalmente remoto, completamente remoto, trabajo remoto, modalidad remota, modalidad remoto, fully remote, remote position, no presencial, sin presencialidad |
+| hibrido | 3 | no | híbrido, hibrido, hybrid | hibrido, hibrida, hybrid, semipresencial, esquema mixto |
+| presencial | 1 | no | presencial, on-site, onsite | presencial, on-site, onsite, on site, trabajo en oficina |

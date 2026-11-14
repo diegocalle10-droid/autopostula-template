@@ -35,6 +35,16 @@ class CvReales(unittest.TestCase):
         self.assertEqual(problemas(solo_datos), [])
 
 
+class FormatoDeLosBase(unittest.TestCase):
+    def test_toda_linea_de_empresa_y_fechas_lleva_el_prefijo_empresa(self):
+        """Mismo método de escritura en todos los puestos de todos los CV base: así la IA no lo uniforma por su cuenta."""
+        for n in BASES:
+            lineas = [l for l in base(n).splitlines() if "|" in l and any(a in l for a in ("2022", "2023", "2024", "2025", "2026")) and l[:1].isalpha()]
+            with self.subTest(n):
+                self.assertTrue(lineas)
+                self.assertTrue(all(l.startswith("Empresa: ") for l in lineas), lineas)
+
+
 class Alteraciones(unittest.TestCase):
     def _fallos(self, viejo, nuevo, nombre="data_analytics"):
         gen = cv_derivado(nombre)
@@ -51,6 +61,11 @@ class Alteraciones(unittest.TestCase):
         self.assertEqual(self._fallos("### Ingeniero de Procesos y Organización Digital", "### Data Engineer"), [])
         self.assertIn("fechas", self._fallos("Julio 2025 – Julio 2026", "Julio 2024 – Julio 2026")[0])
         self.assertIn("fechas", self._fallos("Empresa: Empresa Uno España", "Empresa: Otra SL")[0])
+
+    def test_el_rechazo_de_un_puesto_cita_la_linea_recibida_y_la_del_cv_base(self):
+        f = self._fallos("Empresa: Empresa Uno España", "Empresa Uno España")[0]
+        self.assertIn("«Empresa Uno España (España y Portugal) | Julio 2025", f)
+        self.assertIn("la más parecida es «Empresa: Empresa Uno España", f)
 
     def test_formacion_y_certificaciones(self):
         self.assertIn("estudios", self._fallos("Universidad de Ejemplo (2022) Ingeniería Industrial", "Universidad de Ejemplo (2020) Ingeniería Industrial")[0])
