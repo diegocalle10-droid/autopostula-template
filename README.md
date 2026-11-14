@@ -77,6 +77,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 | `run-continuo [--horas H]` | La captura (lo que lanza `iniciar.bat`) |
 | `status`, `reanudar [--forzar]` | Estado del día y del disyuntor; levantar sus pausas y paradas |
 | `init-db`, `plan`, `run`, `detail`, `prune`, `reevaluar` | Piezas sueltas de la captura (`--dry-run` solo muestra qué haría) |
+| `limpiar-duplicadas [--borrar]` | Lista (o borra, en local y en Neon) las copias de una misma vacante publicada en varias ubicaciones; se conserva la más antigua |
 | `online-init`, `online-subir`, `online-estado`, `online-pdf` | Neon: esquema, subida, comparación, validación y PDF de los CV |
 
 ### Parámetros: `inputs/`
@@ -90,7 +91,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 | `decisiones.md` | Estado y motivo de cada caso |
 | `idioma.md` | Idioma propio y vigilado; glosarios de nivel exigido |
 | `lotes.md` | Ritmo, horas por defecto, cadencias, poda, escalada del 429, apagado del PC |
-| `cv.md` | CV base, umbral de afinidad y tope de la rutina |
+| `cv.md` | CV base, umbral de afinidad, tope de la rutina y reglas de las keywords (mínimo, máximo y cobertura exigida) |
 | `mensajes/` | Todo lo de Telegram: formatos, enlaces de tu instalación, emoji y textos |
 
 ### Mapa del repositorio
@@ -100,6 +101,8 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 | `cli.py`, `iniciar.bat` | Punto de entrada único; lanzador de la captura |
 | `CONFIGURAR.md`, `configurar/` | Guion de la entrevista; CV de ejemplo y glosarios de idioma que copia |
 | `INSTALAR.md`, `guia/` | Guion de la instalación en el PC; guías con capturas de cada servicio |
+| `CV/plantilla.md` | Esqueleto del CV a medida: qué copia el código del CV base (`{{fijo:…}}`) y qué redacta la rutina (`{{rutina:…}}`) |
+| `collector/cv/componer.py`, `collector/filters/cv_cobertura.py`, `collector/online/redaccion.py` | Componen el CV desde la plantilla, comprueban que todas las keywords de la oferta están en las viñetas de experiencia y recalculan la afinidad con evidencia real del CV base |
 | `CV/PROMPT_RUTINA.md`, `CV/PROMPT_MINIMO.md` | Instrucciones de la rutina de CV y la frase que se pega en la rutina |
 | `CV/base/`, `CV/entrada/` | Tus CV base en Markdown; tu PDF, solo durante la entrevista |
 | `skills-project-bot/` | El bot de gestión: prompt, orquestador y skills F1–F7 |
@@ -122,7 +125,7 @@ Normas de código, pruebas y qué va en cada documento: [CLAUDE.md](CLAUDE.md). 
 - **Sin tope diario**: lo limitan las horas de la captura al ritmo de `lotes.md`. Un 429, captcha o verificación nunca se reintenta de inmediato: lo gobierna el disyuntor (escalada en `lotes.md`).
 - **Prefiltro por título** antes de pedir el detalle (la petición escasa) y **paginación por relevancia**: la página siguiente solo si trae suficientes ofertas nuevas y suficientes títulos del perfil.
 - **Las ofertas descartadas se guardan** con su motivo: nunca se repite su detalle. Las descripciones no se purgan: permiten recalibrar las reglas sin volver a pedirlas a LinkedIn.
-- **La modalidad es la etiqueta de LinkedIn**; sin etiqueta vale la primera modalidad aceptada.
+- **La modalidad es la etiqueta de LinkedIn**; sin etiqueta se lee la descripción con las frases de `modalidades.md` (`senales`, en español e inglés): si delata otra modalidad o no delata ninguna, la oferta se descarta (`modalidad:sin_confirmar`) y no gasta redacción de CV.
 - **CV a medida**: emparejamiento laxo (`umbral_afinidad`) porque una persona revisa cada CV; los CV base no se mezclan. El CV vive como Markdown en Neon (`emparejamientos.cv_md`) y el PDF lo genera la Action con ReportLab, sin IA.
 - **SQL solo en `db/` y `online/`**, siempre parametrizado; `inputs/` se valida al arrancar.
 

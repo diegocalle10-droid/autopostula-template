@@ -29,6 +29,7 @@ class Modalidad:
     filtro: str                      # valor del filtro de modalidad de LinkedIn (f_WT)
     aceptada: bool
     etiquetas: Tuple[str, ...]       # cómo la rotula LinkedIn en la tarjeta y en la oferta (normalizadas)
+    senales: Tuple[str, ...] = ()    # frases de la descripción que delatan la modalidad cuando LinkedIn no pone etiqueta
 
 
 @dataclass(frozen=True)
@@ -161,6 +162,9 @@ class ConfigCv:
     cvs: Tuple[CvBase, ...]
     umbral_afinidad: int
     tope_rutina: int
+    keywords_min: int = 10
+    keywords_max: int = 15
+    cobertura_minima: int = 100
 
     def cv(self, cv_id: str) -> Optional[CvBase]:
         return next((c for c in self.cvs if c.id == cv_id), None)

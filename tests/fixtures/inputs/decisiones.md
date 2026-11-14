@@ -33,6 +33,7 @@ Se evalúan de arriba abajo con el detalle ya leído; gana la primera que se cum
 | cerrada | descartada | cerrada |
 | detalle_ilegible | descartada | detalle_ilegible |
 | modalidad_no_aceptada | descartada | modalidad:{modalidad} |
+| modalidad_sin_confirmar | descartada | modalidad:sin_confirmar |
 | nivel_exigente | descartada | ingles_exigente |
 | nivel_dudoso | revisar | ingles_dudoso |
 | contenido_vigilado_titulo_no | revisar | contenido_en_titulo_no_en |
@@ -49,7 +50,8 @@ Se evalúan de arriba abajo con el detalle ya leído; gana la primera que se cum
 |---|---|
 | cerrada | La oferta ya no está activa |
 | detalle_ilegible | Su detalle llegó sin contenido `fallos_por_oferta_para_descartar` veces (`lotes.md`); se aplica sin evaluar la oferta, en cualquier posición |
-| modalidad_no_aceptada | LinkedIn rotula la oferta con una modalidad que no es la aceptada |
+| modalidad_no_aceptada | LinkedIn rotula la oferta con una modalidad que no es la aceptada o, sin etiqueta, la descripción delata otra (`senales` de `modalidades.md`) |
+| modalidad_sin_confirmar | Sin etiqueta de LinkedIn y sin ninguna señal de modalidad en la descripción |
 | nivel_exigente | La descripción exige un nivel alto del idioma vigilado |
 | nivel_dudoso | Hay señales de nivel aceptable y exigente a la vez |
 | contenido_vigilado_titulo_no | La descripción está en el idioma vigilado y el título no |

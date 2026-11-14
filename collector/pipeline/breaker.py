@@ -25,11 +25,6 @@ def puede_ejecutar(con: sqlite3.Connection, cfg: Config, ahora: datetime) -> Tup
     return True, ""
 
 
-def en_horario_permitido(cfg: Config, ahora: datetime) -> bool:
-    """Sin franja horaria: la captura dura las horas que se le piden (`horas_por_defecto`)."""
-    return True
-
-
 def registrar_limite(con: sqlite3.Connection, cfg: Config, ahora: datetime, contexto: str) -> str:
     """Un 429 o desafío anti-bot: aplica el primer escalón de la tabla «Escalada del 429» que se cumple."""
     for e in cfg.escalada_429:

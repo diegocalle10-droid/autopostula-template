@@ -3,17 +3,18 @@ from __future__ import annotations
 
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Callable, Optional
 
 from collector.config.modelos import Config
 from collector.db import eventos_repo, ofertas_repo
 from collector.db.connection import transaccion
+from collector.estados import DESCARTADA
 from collector.filters.evaluar import evaluar
 from collector.linkedin.errores import LimiteError, LinkedinError, NoEncontradaError
 from collector.pipeline import breaker, seleccion
 from collector.pipeline.ritmo import Ritmo
-from collector.util.reloj import a_iso
+from collector.util.reloj import a_iso, de_iso
 
 FALLOS_DE_OFERTA = ("DESCRIPCION_VACIA", "OFERTA_SIN_CONTENIDO")   # la página de esa oferta, no la sesión ni la red
 
@@ -58,9 +59,20 @@ def _guardar(con: sqlite3.Connection, cfg: Config, oferta, detalle: dict, ahora_
         "idioma_contenido": ev.idioma_contenido, "nivel_idioma": ev.nivel_idioma,
         "estado": ev.estado, "motivo_descarte": ev.motivo_descarte,
     }
+    original = _original_por_contenido(con, cfg, oferta, detalle["description"], ahora_iso)
+    if original:   # la misma vacante publicada en otra ubicación: misma regla que la duplicada de ingreso
+        datos.update(estado=DESCARTADA, motivo_descarte=cfg.decisiones.ingreso["duplicada"].motivo_para(None, original))
     with transaccion(con):
         ofertas_repo.guardar_evaluacion(con, oferta["job_id"], datos, ev.keywords, ahora_iso)
-    return ev.estado
+        if original:
+            ofertas_repo.marcar_duplicada(con, oferta["job_id"], original)
+    return datos["estado"]
+
+
+def _original_por_contenido(con: sqlite3.Connection, cfg: Config, oferta, descripcion: str, ahora_iso: str):
+    desde = a_iso(de_iso(ahora_iso) - timedelta(days=cfg.lotes.entero("huella_dias")))
+    empresa = con.execute("SELECT empresa FROM ofertas WHERE job_id = ?", (oferta["job_id"],)).fetchone()[0]
+    return ofertas_repo.buscar_original_por_contenido(con, empresa, descripcion, oferta["job_id"], desde)
 
 
 def procesar_detalles(con: sqlite3.Connection, cfg: Config, cli, ritmo: Ritmo,

@@ -3,6 +3,7 @@ formación, certificaciones e idiomas con su nivel. No se audita el texto de log
 habilidades del stack: se pueden reordenar, omitir y ampliar con criterio, y la revisión final es humana."""
 from __future__ import annotations
 
+import difflib
 import re
 from typing import Dict, Iterable, List, Set
 
@@ -33,6 +34,7 @@ class _Cv:
         self.cabecera: List[str] = []
         self.secciones: Dict[str, List[str]] = {}
         self.puestos: Dict[str, str] = {}
+        self.crudas: Dict[str, str] = {}   # línea de empresa y fechas normalizada -> tal como está escrita
         self._leer(markdown)
 
     def _leer(self, markdown: str) -> None:
@@ -51,6 +53,7 @@ class _Cv:
                 continue
             elif puesto is not None and not self.puestos[puesto] and not s.startswith("- "):
                 self.puestos[puesto] = _n(s)
+                self.crudas[_n(s)] = s
             else:
                 (self.cabecera if seccion is None else self.secciones[seccion]).append(s)
 
@@ -86,10 +89,18 @@ def _problemas_contacto(base: _Cv, gen: _Cv) -> List[str]:
 
 
 def _problemas_puestos(base: _Cv, gen: _Cv) -> List[str]:
-    """El título del cargo se puede adaptar a la oferta; la línea de empresa y fechas tiene que ser una del CV base."""
+    """El título del cargo se puede adaptar a la oferta; la línea de empresa y fechas tiene que ser, carácter a carácter
+    (prefijo «Empresa:» incluido), una del CV base. El mensaje cita la recibida y la más parecida del CV base."""
     lineas_base = set(base.puestos.values())
-    return [f"la empresa o las fechas del puesto «{puesto}» no coinciden con ningún puesto del CV base"
-            for puesto, linea in gen.puestos.items() if linea not in lineas_base]
+    fallos = []
+    for puesto, linea in gen.puestos.items():
+        if linea in lineas_base:
+            continue
+        cercana = difflib.get_close_matches(linea, lineas_base, n=1, cutoff=0.0)
+        esperada = base.crudas[cercana[0]] if cercana else "(ninguna)"
+        fallos.append(f"puesto «{puesto}»: la línea de empresa y fechas «{gen.crudas.get(linea, linea)}» no es del CV base; "
+                      f"cópiala tal cual, la más parecida es «{esperada}»")
+    return fallos
 
 
 def _problemas_listas(base: _Cv, gen: _Cv) -> List[str]:

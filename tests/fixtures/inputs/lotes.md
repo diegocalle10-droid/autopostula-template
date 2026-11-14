@@ -32,7 +32,7 @@ Regla de trabajo, fijada tras el primer 429 del proyecto (2026-10-31, con dos pr
 | pausa_entre_lotes_detail_max | 6 | min | |
 | detalles_pendientes_max | 0 | ofertas | Modo continuo (`run-continuo`): si hay más ofertas elegibles sin detalle que este valor, la siguiente petición es un detalle; si no, una búsqueda. 0 = el detalle va siempre antes de volver a buscar, y al parar no queda cola |
 
-## Horario
+## Duración
 
 | clave | valor | unidad | nota |
 |---|---|---|---|

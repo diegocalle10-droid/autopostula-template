@@ -141,7 +141,7 @@ def _arrancar(con: sqlite3.Connection, cfg: Config, res: ResultadoTanda, pedir: 
               reloj: Callable[[], datetime]) -> bool:
     """Con una parada por sospecha (y nada más que lo impida), primero la búsqueda de control. True si se puede buscar."""
     ahora = reloj()
-    if (breaker.hay_parada_por_sospecha(con, ahora) and breaker.en_horario_permitido(cfg, ahora)
+    if (breaker.hay_parada_por_sospecha(con, ahora)
             and not eventos_repo.otra_pausa_activa(con, a_iso(ahora), breaker.MARCA_SOSPECHA)):
         if _con_control(con, cfg, res, lambda: control.comprobar_al_arrancar(con, cfg, pedir, ahora), ahora):
             return False

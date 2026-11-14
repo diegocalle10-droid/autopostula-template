@@ -9,7 +9,7 @@ from collector.online import mensajes, pdfs, rutina, subir
 from collector.online.esquema import CARPETA
 from tests.ayudas import CliFalso, base_en_memoria, oferta
 from tests.base import Base
-from tests.falso_neon import FalsoNeon
+from tests.falso_neon import FalsoNeon, esquema_neon_sqlite
 from tests.test_db import fila
 from tests.test_online import AHORA, AVISOS_SQLITE
 
@@ -19,7 +19,7 @@ O = {"job_id": "4012345678", "empresa": "Acme <SL>", "titulo": "Analista BI", "u
 
 def neon():
     con = sqlite3.connect(":memory:")
-    con.executescript((CARPETA / "001_neon.sql").read_text(encoding="utf-8"))
+    con.executescript(esquema_neon_sqlite())
     con.executescript(AVISOS_SQLITE)
     con.execute("INSERT INTO ofertas (job_id,url,titulo,empresa,fecha_hallazgo,ultima_vista,modalidad,estado) "
                 "VALUES ('1','https://x/1','Analista','Acme','x','x','remoto','apta')")

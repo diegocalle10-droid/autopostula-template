@@ -33,7 +33,7 @@ Empresa: Marca Dos España | Junio 2024 – Julio 2025
 
 ### Coordinador de Operaciones y Administración
 
-Innova Schools (Grupo Intercorp) | Febrero 2023 – Diciembre 2023
+Empresa: Innova Schools (Grupo Intercorp) | Febrero 2023 – Diciembre 2023
 
 - Coordiné con negocio los requisitos de cada informe y su calendario de entrega.
 - Normalicé la base de clientes y resolví duplicados heredados de una migración.
@@ -43,7 +43,7 @@ Innova Schools (Grupo Intercorp) | Febrero 2023 – Diciembre 2023
 
 ### Analista Funcional & Desarrollo de Soluciones ERP
 
-Sistemas Tres Limitada Chile | Marzo 2022 – Enero 2023
+Empresa: Sistemas Tres Limitada Chile | Marzo 2022 – Enero 2023
 
 - Diseñé el cuadro de mando mensual del área — usado por dirección en cada comité.
 - Automaticé la carga de datos desde tres sistemas, eliminando un proceso manual de dos días.

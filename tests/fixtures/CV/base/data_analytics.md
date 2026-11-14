@@ -23,7 +23,7 @@ Empresa: Empresa Uno España (España y Portugal) | Julio 2025 – Julio 2026
 
 ### Analista de Operaciones y BI | Arquitectura de Automatización Logística
 
-Marca Dos — Madrid, España | Junio 2024 – Julio 2025
+Empresa: Marca Dos — Madrid, España | Junio 2024 – Julio 2025
 
 - Documenté los procesos clave y propuse mejoras que redujeron incidencias recurrentes.
 - Integré una herramienta externa con el ERP mediante su API.
@@ -33,7 +33,7 @@ Marca Dos — Madrid, España | Junio 2024 – Julio 2025
 
 ### Analista Funcional & Desarrollo de Soluciones ERP
 
-Sistemas Tres Limitada — Santiago, Chile | Marzo 2022 – Diciembre 2023
+Empresa: Sistemas Tres Limitada — Santiago, Chile | Marzo 2022 – Diciembre 2023
 
 - Coordiné con negocio los requisitos de cada informe y su calendario de entrega.
 - Normalicé la base de clientes y resolví duplicados heredados de una migración.

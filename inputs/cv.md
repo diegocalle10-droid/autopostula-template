@@ -13,3 +13,6 @@ Cada CV base es una fuente de verdad independiente: cuenta su propia historia y 
 |---|---|---|
 | umbral_afinidad | 35 | % mínimo de requisitos de la oferta cubiertos por el mejor CV. Por debajo, la oferta queda `sin_cv` con su motivo. Lo aplica la rutina de la nube leyendo este archivo, no el código |
 | tope_rutina | 30 | Ofertas que la rutina redacta como mucho por ejecución (el resto, en la siguiente). Lo aplica la rutina leyendo este archivo; el resumen de Telegram lo cita |
+| keywords_min | 10 | Keywords que la rutina extrae como mínimo de cada oferta (las que gobiernan el CV). Con menos, la Action rechaza el CV |
+| keywords_max | 15 | Keywords como máximo por oferta |
+| cobertura_minima | 100 | % de esas keywords que tiene que aparecer en las viñetas de experiencia del CV. Por debajo, la Action lo rechaza con la lista de las que faltan y la rutina lo reescribe |

@@ -11,10 +11,13 @@ from collector.cv.render import MAX_PAGINAS, generar_pdf
 from collector.filters.cv import nombre_pdf, problemas, quitar_marcadores, slug
 from collector.filters.cv_datos import verificar_datos
 from collector.online import avisos, mensajes
+from collector.online.redaccion import Preparado, preparar
 
 # Las validadas sin avisar vuelven a pasar: el PDF se regenera y el aviso se reintenta.
-_COLUMNAS = ("job_id", "cv_id", "cv_md", "afinidad", "intentos", "empresa", "titulo", "url", "ubicacion", "modalidad")
-_PENDIENTES = """SELECT e.job_id, e.cv_id, e.cv_md, e.afinidad, e.intentos, o.empresa, o.titulo, o.url, o.ubicacion, o.modalidad
+_COLUMNAS = ("job_id", "cv_id", "cv_md", "afinidad", "intentos", "empresa", "titulo", "url", "ubicacion", "modalidad",
+             "keywords", "contenido")
+_PENDIENTES = """SELECT e.job_id, e.cv_id, e.cv_md, e.afinidad, e.intentos, o.empresa, o.titulo, o.url, o.ubicacion, o.modalidad,
+                        e.keywords, e.contenido
                  FROM emparejamientos e JOIN ofertas o ON o.job_id = e.job_id
                  WHERE e.estado = 'redactada' OR (e.estado = 'validada' AND e.notificado_en IS NULL)
                  ORDER BY e.emparejado_en LIMIT %s"""
@@ -23,15 +26,21 @@ INTENTOS_CON_AVISO = (1, INTENTOS_MAXIMOS)
 Enviar = Callable[[Path, str], None]
 
 
-def motivo_rechazo(cfg, raiz: Path, cv_id: str, markdown: str) -> str:
-    """'' si el CV es válido; si no, lo que hay que corregir."""
-    base = cfg.cv.cv(cv_id or "")
+def revisar(cfg, raiz: Path, o: Dict) -> tuple:
+    """(Preparado, motivo): el CV listo para validar (compuesto si la rutina entregó `contenido`) y '' si es válido;
+    si no, lo que hay que corregir."""
+    sin_cambios = Preparado(o.get("cv_md") or "")
+    base = cfg.cv.cv(o.get("cv_id") or "")
     if base is None:
-        return f"CV base desconocido «{cv_id}»"
+        return sin_cambios, f"CV base desconocido «{o.get('cv_id')}»"
     archivo = Path(raiz) / base.archivo
     if not archivo.is_file():
-        return f"no existe el CV base {base.archivo}"
-    return "; ".join(problemas(markdown) + verificar_datos(archivo.read_text(encoding="utf-8"), markdown))
+        return sin_cambios, f"no existe el CV base {base.archivo}"
+    base_md = archivo.read_text(encoding="utf-8")
+    prep = preparar(cfg, raiz, o, base_md)
+    if prep.errores and not prep.cv_md:
+        return prep, "; ".join(prep.errores)
+    return prep, "; ".join(prep.errores + problemas(prep.cv_md) + verificar_datos(base_md, prep.cv_md))
 
 
 def _rechazar(pg, o: Dict, motivo: str) -> None:
@@ -44,9 +53,14 @@ def _rechazar(pg, o: Dict, motivo: str) -> None:
     pg.commit()
 
 
-def _validar(pg, job_id: str, ahora: str) -> None:
-    pg.cursor().execute("UPDATE emparejamientos SET estado = 'validada', rechazo = NULL, validado_en = COALESCE(validado_en, %s) WHERE job_id = %s",
-                        (ahora, job_id))
+def _validar(pg, job_id: str, ahora: str, prep: Preparado) -> None:
+    cur = pg.cursor()
+    cur.execute("UPDATE emparejamientos SET estado = 'validada', rechazo = NULL, validado_en = COALESCE(validado_en, %s) WHERE job_id = %s",
+                (ahora, job_id))
+    if prep.afinidad is not None:   # runbook v7: se guarda el CV compuesto y la afinidad con evidencia real
+        cur.execute("UPDATE emparejamientos SET cv_md = %s, afinidad = %s, requisitos_cubiertos = %s, "
+                    "requisitos_faltantes = %s WHERE job_id = %s",
+                    (prep.cv_md, prep.afinidad, prep.cubiertos, prep.sin_respaldo, job_id))
     pg.commit()
 
 
@@ -75,7 +89,10 @@ def procesar(pg, cfg, raiz: Path, salida: Path, ahora: str, maximo: int = 50,
     cur.execute(_PENDIENTES, (maximo,))
     res: Dict[str, List[str]] = {"validadas": [], "rechazadas": [], "avisadas": []}
     for o in (dict(zip(_COLUMNAS, f)) for f in cur.fetchall()):
-        motivo, destino = motivo_rechazo(cfg, raiz, o["cv_id"], o["cv_md"]), None
+        prep, motivo = revisar(cfg, raiz, o)
+        o["cv_md"], destino = prep.cv_md, None
+        if prep.afinidad is not None:
+            o["afinidad"] = prep.afinidad
         if not motivo:
             destino, motivo = _pdf(o, salida)
         if motivo:
@@ -83,7 +100,7 @@ def procesar(pg, cfg, raiz: Path, salida: Path, ahora: str, maximo: int = 50,
             res["rechazadas"].append(o["job_id"])
             log(f"RECHAZADA {o['job_id']}: {motivo}")
             continue
-        _validar(pg, o["job_id"], ahora)
+        _validar(pg, o["job_id"], ahora, prep)
         res["validadas"].append(o["job_id"])
         log(f"OK        {o['job_id']}: PDF listo")
         if enviar and _avisar(pg, o, ahora, destino, enviar, log):

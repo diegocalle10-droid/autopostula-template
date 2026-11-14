@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from collector.comandos import datos, ejecucion, geoids, instalacion, online
+from collector.comandos import datos, duplicadas, ejecucion, geoids, instalacion, online
 from collector.config.modelos import ConfigError
 
 RAIZ = Path(__file__).resolve().parent
@@ -21,10 +21,7 @@ def _parser() -> argparse.ArgumentParser:
     _comandos_instalacion(sub)
     sub.add_parser("init-db", help="crea o actualiza la base de datos").set_defaults(f=datos.init_db)
     sub.add_parser("plan", help="sincroniza la agenda de búsquedas con inputs/").set_defaults(f=datos.plan)
-    rv = sub.add_parser("reevaluar", help="aplica las reglas actuales a las aptas y por revisar con descripción (sin LinkedIn)")
-    rv.add_argument("--dry-run", action="store_true", help="solo muestra qué cambiaría")
-    rv.set_defaults(f=datos.reevaluar)
-    sub.add_parser("prune", help="poda por rendimiento").set_defaults(f=datos.podar)
+    _comandos_mantenimiento(sub)
     sub.add_parser("status", help="peticiones del día, disyuntor y conteos").set_defaults(f=datos.status)
     sub.add_parser("doctor", help="comprueba el entorno, los secretos y los CV base").set_defaults(f=instalacion.doctor)
     sub.add_parser("sesion", help="comprueba la sesión de LinkedIn y, si hace falta, pide iniciarla").set_defaults(f=ejecucion.sesion)
@@ -57,6 +54,17 @@ def _comandos_instalacion(sub) -> None:
     pt.add_argument("titulos", nargs="+", help="títulos entre comillas")
     pt.set_defaults(f=instalacion.probar_titulos)
     sub.add_parser("telegram-chat-id", help="muestra el TELEGRAM_CHAT_ID tras escribirle a tu bot").set_defaults(f=instalacion.telegram_chat_id)
+
+
+def _comandos_mantenimiento(sub) -> None:
+    """Sin peticiones a LinkedIn: reevaluar, podar y limpiar duplicadas."""
+    rv = sub.add_parser("reevaluar", help="aplica las reglas actuales a las aptas y por revisar con descripción (sin LinkedIn)")
+    rv.add_argument("--dry-run", action="store_true", help="solo muestra qué cambiaría")
+    rv.set_defaults(f=datos.reevaluar)
+    sub.add_parser("prune", help="poda por rendimiento").set_defaults(f=datos.podar)
+    ld = sub.add_parser("limpiar-duplicadas", help="borra las copias de una misma vacante en varias ubicaciones (lista sin --borrar)")
+    ld.add_argument("--borrar", action="store_true", help="borra de verdad, en la base local y en Neon")
+    ld.set_defaults(f=duplicadas.limpiar_duplicadas)
 
 
 def _comando_geoids(sub) -> None:

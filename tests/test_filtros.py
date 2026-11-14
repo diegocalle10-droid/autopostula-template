@@ -66,28 +66,40 @@ class Evaluacion(unittest.TestCase):
         e = self._ev("Analista de datos", ES + " Se valora inglés técnico.", modalidad="remoto")
         self.assertEqual((e.estado, e.nivel_idioma, e.modalidad_detectada), ("apta", "aceptable", "remoto"))
 
-    def test_sin_etiqueta_vale_la_modalidad_con_la_que_se_busco(self):
+    def test_sin_etiqueta_y_sin_senal_se_descarta_por_modalidad_sin_confirmar(self):
         e = self._ev("Analista de datos", ES)
-        self.assertEqual((e.estado, e.motivo_descarte, e.modalidad_detectada), ("apta", None, None))
+        self.assertEqual((e.estado, e.motivo_descarte, e.modalidad_detectada), ("descartada", "modalidad:sin_confirmar", None))
 
-    def test_la_descripcion_ya_no_decide_la_modalidad(self):
-        for frase in ("Trabajo híbrido.", "Modalidad presencial.", "Hybrid role."):
+    def test_sin_etiqueta_la_descripcion_decide_la_modalidad(self):
+        casos = {"Trabajo Hibrido, 1 a 2 veces por semana.": ("descartada", "modalidad:hibrido", "hibrido"),
+                 "Modalidad presencial.": ("descartada", "modalidad:presencial", "presencial"),
+                 "Hybrid role.": ("descartada", "modalidad:hibrido", "hibrido"),
+                 "Posición 100% remoto desde Perú.": ("apta", None, "remoto"),
+                 "Puesto no presencial.": ("apta", None, "remoto"),
+                 "Trabajo remoto o híbrido.": ("descartada", "modalidad:hibrido", "hibrido"),
+                 "Teletrabajo y semanas full remote.": ("descartada", "modalidad:sin_confirmar", None)}
+        for frase, esperado in casos.items():
             with self.subTest(frase):
-                self.assertEqual(self._ev("Analista de datos", ES + " " + frase).estado, "apta")
+                e = self._ev("Analista de datos", ES + " " + frase)
+                self.assertEqual((e.estado, e.motivo_descarte, e.modalidad_detectada), esperado)
+
+    def test_la_etiqueta_manda_sobre_la_descripcion(self):
+        e = self._ev("Analista de datos", ES + " Trabajo híbrido.", modalidad="remoto")
+        self.assertEqual((e.estado, e.modalidad_detectada), ("apta", "remoto"))
 
     def test_titulo_en_ingles_con_anuncio_en_espanol_no_descarta(self):
         self.assertEqual(self._ev("Data Analyst", ES, modalidad="remoto").estado, "apta")
 
     def test_ingles_exigente_descarta(self):
-        e = self._ev("Analista de datos", ES + " Imprescindible inglés avanzado.")
+        e = self._ev("Analista de datos", ES + " Imprescindible inglés avanzado.", modalidad="remoto")
         self.assertEqual((e.estado, e.motivo_descarte), ("descartada", "ingles_exigente"))
 
     def test_anuncio_en_ingles_sin_glosario_descarta(self):
-        e = self._ev("Data Analyst", EN)
+        e = self._ev("Data Analyst", EN, modalidad="remoto")
         self.assertEqual((e.estado, e.motivo_descarte), ("descartada", "idioma_en_sin_glosario"))
 
     def test_anuncio_en_ingles_con_ingles_aceptable_va_a_revisar(self):
-        self.assertEqual(self._ev("Data Analyst", EN + " Intermediate English.").estado, "revisar")
+        self.assertEqual(self._ev("Data Analyst", EN + " Intermediate English.", modalidad="remoto").estado, "revisar")
 
     def test_contenido_mixto_no_se_descarta(self):
         self.assertEqual(self._ev("Analista de datos", ES + " " + EN, modalidad="remoto").estado, "apta")
